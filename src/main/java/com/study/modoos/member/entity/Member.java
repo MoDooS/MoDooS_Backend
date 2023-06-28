@@ -32,7 +32,8 @@ public class Member {
 
     @NotNull
     @Column(name = "campus", length = 10)
-    private String campus;
+    @Enumerated(EnumType.STRING)
+    private Campus campus;
 
     @NotNull
     @Column(name = "ranking", length = 10)
