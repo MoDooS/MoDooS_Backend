@@ -28,4 +28,21 @@ public class MemberService {
         member.updateNickname(memberInfoRequest.getNickname());
         member.updateCampus(memberInfoRequest.getCampus());
     }
+
+    public void join(Member member) {
+        if (isDuplicated(member.getNickname())) {
+            throw new IllegalArgumentException("");
+        }
+        memberRepository.save(member);
+    }
+
+    public boolean nicknameCheck(String nickname) {
+        return isDuplicated(nickname);
+    }
+
+    private boolean isDuplicated(String nickname){
+        boolean isDuplicated = false;
+        if(memberRepository.findByNickname(nickname).isPresent()) isDuplicated = true;
+        return isDuplicated;
+    }
 }

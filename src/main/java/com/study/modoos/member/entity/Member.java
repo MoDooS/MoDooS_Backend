@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,7 +23,7 @@ public class Member {
     private String nickname;
 
     @NotNull
-    @Column(name = "password", length = 40)
+    @Column(name = "password", length = 100)
     private String password;
 
     @Email
@@ -47,11 +48,23 @@ public class Member {
     @Column(name = "isMember")
     private Boolean isMember;
 
+
     public void updateNickname(String Nickname) {
         this.nickname = nickname;
     }
 
     public void updateCampus(String campus) {
         this.campus = Campus.valueOf(campus);
+
+    @Builder
+    public Member(String nickname, String password, String email, Campus campus){
+        this.nickname = nickname;
+        this.password = password;
+        this.email = email;
+        this.campus =campus;
+        this.ranking = "B";
+        this.score = 200L;
+        this.isMember = true;
+
     }
 }
