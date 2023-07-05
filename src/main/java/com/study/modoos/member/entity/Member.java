@@ -47,6 +47,8 @@ public class Member {
     @NotNull
     @Column(name = "isMember")
     private Boolean isMember;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Builder
     public Member(String nickname, String password, String email, Campus campus){
@@ -57,5 +59,6 @@ public class Member {
         this.ranking = "B";
         this.score = 200L;
         this.isMember = true;
+        this.role = Role.MEMBER;
     }
 }

@@ -33,6 +33,22 @@ dependencies {
 	// SpringSecurity
 	implementation 'org.springframework.boot:spring-boot-starter-security:3.0.4'
 	testImplementation 'org.springframework.security:spring-security-test'
+
+	//Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+
+	//io.jsonwebtoken : jwt
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+
+	// com.sun.xml.bind : jwt
+	implementation 'com.sun.xml.bind:jaxb1-impl:2.2.5.1'
+	implementation 'com.sun.xml.bind:jaxb-core:4.0.2'
+	// javax.xml.bind : jwt
+	implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
 }
 
 tasks.named('test') {
