@@ -1,12 +1,12 @@
 package com.study.modoos.member.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Getter
@@ -49,6 +49,14 @@ public class Member {
     private Boolean isMember;
     @Enumerated(EnumType.STRING)
     private Role role;
+
+
+    public void updateNickname(String Nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateCampus(String campus) {
+        this.campus = Campus.valueOf(campus);
 
     @Builder
     public Member(String nickname, String password, String email, Campus campus){
