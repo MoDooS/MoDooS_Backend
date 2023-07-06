@@ -47,6 +47,8 @@ public class Member {
     @NotNull
     @Column(name = "isMember")
     private Boolean isMember;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
 
     public void updateNickname(String Nickname) {
@@ -65,6 +67,6 @@ public class Member {
         this.ranking = "B";
         this.score = 200L;
         this.isMember = true;
-
+        this.role = Role.MEMBER;
     }
 }
