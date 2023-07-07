@@ -49,6 +49,9 @@ dependencies {
 	implementation 'com.sun.xml.bind:jaxb-core:4.0.2'
 	// javax.xml.bind : jwt
 	implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
+
+	//email
+	implementation 'org.springframework.boot:spring-boot-starter-mail:3.0.4'
 }
 
 tasks.named('test') {

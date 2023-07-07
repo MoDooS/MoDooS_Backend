@@ -1,5 +1,7 @@
-package com.study.modoos.auth.jwt;
+package com.study.modoos.auth.config;
 
+import com.study.modoos.auth.jwt.JwtFilter;
+import com.study.modoos.auth.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

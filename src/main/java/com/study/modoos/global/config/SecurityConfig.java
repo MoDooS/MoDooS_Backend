@@ -5,7 +5,6 @@ import com.study.modoos.auth.exception.JwtAccessDeniedHandler;
 import com.study.modoos.auth.exception.JwtAuthenticationEntryPoint;
 import com.study.modoos.auth.jwt.JwtFilter;
 import com.study.modoos.auth.jwt.JwtProvider;
-import com.study.modoos.auth.jwt.JwtSecurityConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
 @Configuration
@@ -37,6 +37,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(AbstractHttpConfigurer::disable)
                 .sessionManagement((sessionManagement) ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -50,11 +51,11 @@ public class SecurityConfig {
                         authorizeRequests.requestMatchers(
                                 API_PREFIX + "/member/join",
                                 API_PREFIX + "/member/nickname-check",
-                                        API_PREFIX + "/auth/login")
+                                        API_PREFIX + "/auth/login",
+                                        API_PREFIX + "/auth/email-confirm")
                                 .permitAll())
-                .authorizeHttpRequests((authorizeRequests)-> authorizeRequests.anyRequest().authenticated());
-        // jwt 적용
-        http.apply(new JwtSecurityConfig(jwtTokenProvider));
+                .authorizeHttpRequests((authorizeRequests)-> authorizeRequests.anyRequest().hasRole("MEMBER"))
+                .addFilterBefore(new JwtFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
     @Bean

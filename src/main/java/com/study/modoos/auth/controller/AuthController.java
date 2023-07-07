@@ -4,6 +4,7 @@ import com.study.modoos.auth.dto.LoginRequest;
 import com.study.modoos.auth.dto.LoginResponse;
 import com.study.modoos.auth.dto.TokenDto;
 import com.study.modoos.auth.service.AuthService;
+import com.study.modoos.auth.service.EmailService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final long COOKIE_EXPIRATION = 7776000; // 90일
+    private final EmailService emailService;
 
 
     @PostMapping("/login")
@@ -85,4 +87,11 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
                 .build();
     }
+
+    @PostMapping("/email-confirm")
+    public String emailConfirm(@RequestParam String email) throws Exception{
+        String confirm = emailService.sendSimpleMessage(email);
+        return confirm;
+    }
+
 }
