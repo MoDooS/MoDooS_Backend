@@ -43,7 +43,7 @@ public class EmailServiceImpl implements EmailService{
 
 
         message.setText(msgg, "utf-8", "html"); // 내용
-        message.setFrom(new InternetAddress("tk.yoon0105@gmail.com", "MoS 모두의 스터디")); // 보내는 사람
+        message.setFrom(new InternetAddress("modustudy00@gmail.com", "MoS 모두의 스터디")); // 보내는 사람
 
         return message;
     }
