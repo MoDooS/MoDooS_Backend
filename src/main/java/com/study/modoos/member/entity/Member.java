@@ -57,7 +57,7 @@ public class Member {
 
     public void updateCampus(String campus) {
         this.campus = Campus.valueOf(campus);
-
+    }
     @Builder
     public Member(String nickname, String password, String email, Campus campus){
         this.nickname = nickname;

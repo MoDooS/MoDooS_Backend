@@ -1,12 +1,14 @@
 package com.study.modoos.auth.service;
 
 import com.study.modoos.member.entity.Member;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
+@Getter
 public class PrincipalDetails implements UserDetails {
     private final Member member;
     public PrincipalDetails(Member member){this.member = member;}

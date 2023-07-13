@@ -4,13 +4,16 @@ import com.study.modoos.auth.dto.LoginRequest;
 import com.study.modoos.auth.dto.LoginResponse;
 import com.study.modoos.auth.dto.TokenDto;
 import com.study.modoos.auth.jwt.JwtProvider;
+import com.study.modoos.common.exception.BadRequestException;
+import com.study.modoos.member.entity.Member;
+import com.study.modoos.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,22 +22,24 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-@Transactional(readOnly = false)
 public class AuthService {
+    private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final RedisService redisService;
     private final JwtProvider jwtProvider;
     private final String SERVER = "Server";
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
-
     private static final String TOKEN_TYPE = "Bearer";
 
     // 로그인: 인증 정보 저장 및 비어 토큰 발급
-    @Transactional
     public LoginResponse login(LoginRequest loginRequest) {
+        Member member = memberRepository.findByEmail(loginRequest.getEmail())
+                .orElseThrow(()-> new BadRequestException("존재하지 않는 이메일입니다."));
+        if (!passwordEncoder.matches(loginRequest.getPassword(), member.getPassword())){
+            throw new BadRequestException("비밀번호를 확인하십시오.");
+        }
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),loginRequest.getPassword(),null);
-
         Authentication authentication = authenticationManager.authenticate(authToken);
         TokenDto tokenDTO = generateToken(SERVER,authentication.getName(),getAuthorities(authentication));
         return new LoginResponse(TOKEN_TYPE, tokenDTO.getAccessToken(), tokenDTO.getRefreshToken());

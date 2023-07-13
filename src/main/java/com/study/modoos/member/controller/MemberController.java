@@ -39,7 +39,6 @@ public class MemberController {
         return ResponseEntity.ok(NormalResponse.success());
     }
 
-    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/join")
     public void join(@RequestBody @Valid MemberJoinRequest memberJoinRequest){
