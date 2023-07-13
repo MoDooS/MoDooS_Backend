@@ -1,4 +1,4 @@
-package com.study.modoos.global.config;
+package com.study.modoos.common.config;
 
 
 import com.study.modoos.auth.exception.JwtAccessDeniedHandler;
@@ -38,6 +38,9 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .headers(AbstractHttpConfigurer::disable)
                 .sessionManagement((sessionManagement) ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -54,8 +57,8 @@ public class SecurityConfig {
                                         API_PREFIX + "/auth/login",
                                         API_PREFIX + "/auth/email-confirm")
                                 .permitAll())
-                .authorizeHttpRequests((authorizeRequests)-> authorizeRequests.anyRequest().hasRole("MEMBER"))
-                .addFilterBefore(new JwtFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+                .authorizeHttpRequests((authorizeRequests)-> authorizeRequests.anyRequest().authenticated())
+                .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
     @Bean

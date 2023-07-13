@@ -1,25 +1,23 @@
 package com.study.modoos.auth.service;
 
 import com.study.modoos.member.entity.Member;
-import com.study.modoos.member.repository.MemberRepository;
+import com.study.modoos.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class PrincipalDetailsService implements UserDetailsService {
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
     @Override
-    public PrincipalDetails loadUserByUsername(String id) throws UsernameNotFoundException {
-        Member findUser = memberRepository.findById(Long.valueOf(id))
-                .orElseThrow(() -> new UsernameNotFoundException("해당 id를 가진 회원을 찾을 수 없습니다 -> " + id));
+    public PrincipalDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Member findMember = memberService.findByEmail(email);
 
-        if(findUser != null){
-            PrincipalDetails principalDetails = new PrincipalDetails(findUser);
-            return  principalDetails;
+        if(findMember != null){
+            return new PrincipalDetails(findMember);
         }
 
         return null;

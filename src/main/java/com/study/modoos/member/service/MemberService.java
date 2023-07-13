@@ -1,16 +1,15 @@
 package com.study.modoos.member.service;
 
+import com.study.modoos.common.exception.BadRequestException;
 import com.study.modoos.member.entity.Member;
 import com.study.modoos.member.repository.MemberRepository;
 import com.study.modoos.member.request.MemberInfoRequest;
 import com.study.modoos.member.response.MemberInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class MemberService {
     private final MemberRepository memberRepository;
 
@@ -31,7 +30,7 @@ public class MemberService {
 
     public void join(Member member) {
         if (isDuplicated(member.getNickname())) {
-            throw new IllegalArgumentException("");
+            throw new BadRequestException("이미 존재하는 닉네임입니다.");
         }
         memberRepository.save(member);
     }
@@ -41,8 +40,12 @@ public class MemberService {
     }
 
     private boolean isDuplicated(String nickname){
-        boolean isDuplicated = false;
-        if(memberRepository.findByNickname(nickname).isPresent()) isDuplicated = true;
+        boolean isDuplicated = memberRepository.findByNickname(nickname).isPresent();
         return isDuplicated;
+    }
+
+    public Member findByEmail(String email){
+        return memberRepository.findByEmail(email)
+                .orElseThrow(()-> new BadRequestException("존재하지 않은 이메일입니다."));
     }
 }
