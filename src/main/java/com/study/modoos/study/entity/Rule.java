@@ -11,16 +11,15 @@ import java.util.Objects;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "rule")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Rule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "study_id")
+    @OneToOne(mappedBy = "rule")
     private Study study;
 
     @Column(nullable = false, length = 2000)
@@ -35,7 +34,7 @@ public class Rule {
     private int late;
 
     @ColumnDefault("0")
-    @Column(name = "out")
+    @Column(name = "outs")
     private int out;
 
     @Builder
