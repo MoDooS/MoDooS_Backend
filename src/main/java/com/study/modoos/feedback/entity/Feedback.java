@@ -20,15 +20,15 @@ public class Feedback extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "study_id")
+    @JoinColumn(name = "study_id", referencedColumnName = "id")
     private Study study;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "receiver_id")
+    @JoinColumn(name = "receiver_id", referencedColumnName = "id")
     private Participant receiver;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "sender_id")
+    @JoinColumn(name = "sender_id", referencedColumnName = "id")
     private Participant sender;
 
     @ColumnDefault("0")

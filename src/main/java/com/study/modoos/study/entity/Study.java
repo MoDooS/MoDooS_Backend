@@ -22,7 +22,7 @@ public class Study {
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "leader_id")
+    @JoinColumn(name = "leader_id", referencedColumnName = "id")
     private Member leader;
 
     @Column(nullable = false, length = 100)
@@ -30,6 +30,9 @@ public class Study {
 
     @Column(nullable = false, length = 2000)
     private String description;
+
+    @OneToOne
+    private Rule rule;
 
     @ColumnDefault("0")
     @Column(name = "recruits_count")

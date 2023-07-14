@@ -17,6 +17,7 @@ import java.util.Objects;
 
 @Entity
 @Getter
+@Table(name = "comment")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
 @ToString(exclude = {"writer", "study"})
@@ -27,11 +28,11 @@ public class Comment extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "study_id")
+    @JoinColumn(name = "study_id", referencedColumnName = "id")
     private Study study;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "writer_id")
+    @JoinColumn(name = "writer_id", referencedColumnName = "id")
     private Member writer;
 
     @Column(nullable = false, length = 1000)
@@ -42,7 +43,7 @@ public class Comment extends BaseTimeEntity {
     private Boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
+    @JoinColumn(name = "parent_id", referencedColumnName = "id")
     private Comment parent;
 
     @OneToMany(mappedBy = "parent", orphanRemoval = true)
