@@ -1,4 +1,4 @@
-package com.study.modoos.member.dto;
+package com.study.modoos.member.request;
 
 import lombok.AccessLevel;
 import lombok.Getter;
