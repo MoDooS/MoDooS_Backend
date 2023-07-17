@@ -1,6 +1,7 @@
 package com.study.modoos.member.service;
 
 import com.study.modoos.common.exception.BadRequestException;
+import com.study.modoos.member.entity.Campus;
 import com.study.modoos.member.entity.Member;
 import com.study.modoos.member.repository.MemberRepository;
 import com.study.modoos.member.request.MemberInfoRequest;
@@ -25,7 +26,9 @@ public class MemberService {
                 .orElseThrow(() -> new IllegalArgumentException("유저 정보를 찾지 못했습니다."));
 
         member.updateNickname(memberInfoRequest.getNickname());
-        member.updateCampus(memberInfoRequest.getCampus());
+        String campus = memberInfoRequest.getCampus();
+        member.updateCampus(Campus.of(campus));
+        memberRepository.save(member);
     }
 
     public void join(Member member) {
@@ -40,8 +43,7 @@ public class MemberService {
     }
 
     private boolean isDuplicated(String nickname){
-        boolean isDuplicated = memberRepository.findByNickname(nickname).isPresent();
-        return isDuplicated;
+        return memberRepository.findByNickname(nickname).isPresent();
     }
 
     public Member findByEmail(String email){

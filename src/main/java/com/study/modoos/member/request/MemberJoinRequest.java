@@ -1,4 +1,4 @@
-package com.study.modoos.member.dto;
+package com.study.modoos.member.request;
 
 import com.study.modoos.member.entity.Campus;
 import com.study.modoos.member.entity.Member;
@@ -21,14 +21,14 @@ public class MemberJoinRequest {
     @NotBlank(message = "이메일은 필수 입력값입니다.")
     @Email(message = "이메일 형식이 올바르지 않습니다.")
     private String email;
-    private Campus campus;
+    private String campus;
 
     public Member joinMember(PasswordEncoder passwordEncoder){
         return Member.builder()
                 .nickname(nickname)
                 .password(passwordEncoder.encode(password))
                 .email(email)
-                .campus(campus)
+                .campus(Campus.of(campus))
                 .build();
     }
 

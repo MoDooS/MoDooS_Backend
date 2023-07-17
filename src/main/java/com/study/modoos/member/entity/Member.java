@@ -51,12 +51,12 @@ public class Member {
     private Role role;
 
 
-    public void updateNickname(String Nickname) {
+    public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
 
-    public void updateCampus(String campus) {
-        this.campus = Campus.valueOf(campus);
+    public void updateCampus(Campus campus) {
+        this.campus = campus;
     }
     @Builder
     public Member(String nickname, String password, String email, Campus campus){
