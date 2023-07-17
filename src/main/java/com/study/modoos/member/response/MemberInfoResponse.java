@@ -26,7 +26,7 @@ public class MemberInfoResponse {
         return MemberInfoResponse.builder()
                 .nickname(member.getNickname())
                 .email(member.getEmail())
-                .campus(member.getCampus().toString())
+                .campus(member.getCampus().getCampusName())
                 .ranking(member.getRanking())
                 .score(member.getScore())
                 .build();

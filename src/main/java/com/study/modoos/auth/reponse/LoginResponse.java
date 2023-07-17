@@ -1,4 +1,4 @@
-package com.study.modoos.auth.dto;
+package com.study.modoos.auth.reponse;
 
 import lombok.AccessLevel;
 import lombok.Getter;

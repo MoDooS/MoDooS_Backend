@@ -1,7 +1,7 @@
 package com.study.modoos.auth.controller;
 
-import com.study.modoos.auth.dto.LoginRequest;
-import com.study.modoos.auth.dto.LoginResponse;
+import com.study.modoos.auth.request.LoginRequest;
+import com.study.modoos.auth.reponse.LoginResponse;
 import com.study.modoos.auth.dto.TokenDto;
 import com.study.modoos.auth.service.AuthService;
 import com.study.modoos.auth.service.EmailService;

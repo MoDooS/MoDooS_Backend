@@ -1,13 +1,14 @@
 package com.study.modoos.member.controller;
 
 
+import com.study.modoos.common.CurrentUser;
 import com.study.modoos.common.response.NormalResponse;
 import com.study.modoos.member.entity.Member;
 import com.study.modoos.member.request.MemberInfoRequest;
 import com.study.modoos.member.response.MemberInfoResponse;
 import com.study.modoos.member.service.MemberService;
-import com.study.modoos.member.dto.MemberJoinRequest;
-import com.study.modoos.member.dto.MemberNicknameCheckRequest;
+import com.study.modoos.member.request.MemberJoinRequest;
+import com.study.modoos.member.request.MemberNicknameCheckRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,21 +29,22 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/myInfo")
-    public ResponseEntity<MemberInfoResponse> getMyMemberInfo(Member member) {
+    public ResponseEntity<MemberInfoResponse> getMyMemberInfo(@CurrentUser Member member) {
         MemberInfoResponse response = memberService.getMemberInfo(member);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/myInfo")
-    public ResponseEntity<NormalResponse> updateMyMemberInfo(Member member, MemberInfoRequest memberInfoRequest) {
+    public ResponseEntity<NormalResponse> updateMyMemberInfo(@CurrentUser Member member, @RequestBody @Valid MemberInfoRequest memberInfoRequest) {
         memberService.updateMemberInfo(member, memberInfoRequest);
         return ResponseEntity.ok(NormalResponse.success());
     }
 
 
     @PostMapping("/join")
-    public void join(@RequestBody @Valid MemberJoinRequest memberJoinRequest){
+    public ResponseEntity<NormalResponse> join(@RequestBody @Valid MemberJoinRequest memberJoinRequest){
         memberService.join(memberJoinRequest.joinMember(passwordEncoder));
+        return ResponseEntity.ok(NormalResponse.success());
     }
 
     @PostMapping("/nickname-check")
