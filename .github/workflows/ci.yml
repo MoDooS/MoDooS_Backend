@@ -2,8 +2,8 @@ name: Java CI with Gradle & Deploy to EC2
 
 # release 브런치에 push 되면 아래의 flow가 실행됩니다.
 on:
-  merge:
-    push: [ "release" ]
+  push:
+    branches: [ "release" ]
 
 
 # flow에서 사용할 변수 같은 느낌입니다.
