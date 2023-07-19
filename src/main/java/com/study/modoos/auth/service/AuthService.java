@@ -1,10 +1,11 @@
 package com.study.modoos.auth.service;
 
-import com.study.modoos.auth.request.LoginRequest;
-import com.study.modoos.auth.reponse.LoginResponse;
 import com.study.modoos.auth.dto.TokenDto;
 import com.study.modoos.auth.jwt.JwtProvider;
-import com.study.modoos.common.exception.BadRequestException;
+import com.study.modoos.auth.reponse.LoginResponse;
+import com.study.modoos.auth.request.LoginRequest;
+import com.study.modoos.common.exception.ErrorCode;
+import com.study.modoos.common.exception.ModoosException;
 import com.study.modoos.member.entity.Member;
 import com.study.modoos.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,32 +24,34 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class AuthService {
+    private static final String TOKEN_TYPE = "Bearer";
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final RedisService redisService;
     private final JwtProvider jwtProvider;
     private final String SERVER = "Server";
-    private static final String TOKEN_TYPE = "Bearer";
 
     // 로그인: 인증 정보 저장 및 비어 토큰 발급
     public LoginResponse login(LoginRequest loginRequest) {
         Member member = memberRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(()-> new BadRequestException("존재하지 않는 이메일입니다."));
-        if (!passwordEncoder.matches(loginRequest.getPassword(), member.getPassword())){
-            throw new BadRequestException("비밀번호를 확인하십시오.");
+                .orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_FOUND));
+        if (!passwordEncoder.matches(loginRequest.getPassword(), member.getPassword())) {
+            throw new ModoosException(ErrorCode.UNAUTHORIZED_MEMBER);
         }
         UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),loginRequest.getPassword(),null);
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword(), null);
         Authentication authentication = authenticationManager.authenticate(authToken);
-        TokenDto tokenDTO = generateToken(SERVER,authentication.getName(),getAuthorities(authentication));
+        TokenDto tokenDTO = generateToken(SERVER, authentication.getName(), getAuthorities(authentication));
         return new LoginResponse(TOKEN_TYPE, tokenDTO.getAccessToken(), tokenDTO.getRefreshToken());
     }
+
     // AT가 만료일자만 초과한 유효한 토큰인지 검사
     public boolean validate(String requestAccessTokenInHeader) {
         String requestAccessToken = resolveToken(requestAccessTokenInHeader);
         return jwtProvider.validateAccessTokenOnlyExpired(requestAccessToken); // true = 재발급
     }
+
     // 토큰 재발급: validate 메서드가 true 반환할 때만 사용 -> AT, RT 재발급
     @Transactional
     public TokenDto reissue(String requestAccessTokenInHeader, String requestRefreshToken) {
@@ -63,7 +66,7 @@ public class AuthService {
         }
 
         // 요청된 RT의 유효성 검사 & Redis에 저장되어 있는 RT와 같은지 비교
-        if(!jwtProvider.validateRefreshToken(requestRefreshToken) || !refreshTokenInRedis.equals(requestRefreshToken)) {
+        if (!jwtProvider.validateRefreshToken(requestRefreshToken) || !refreshTokenInRedis.equals(requestRefreshToken)) {
             redisService.deleteValues("RT(" + SERVER + "):" + principal); // 탈취 가능성 -> 삭제
             return null; // -> 재로그인 요청
         }
@@ -77,16 +80,17 @@ public class AuthService {
         saveRefreshToken(SERVER, principal, tokenDto.getRefreshToken());
         return tokenDto;
     }
+
     // 토큰 발급
     @Transactional
     public TokenDto generateToken(String provider, String id, String authorities) {
         // RT가 이미 있을 경우
-        if(redisService.getValues("RT(" + provider + "):" + id) != null) {
+        if (redisService.getValues("RT(" + provider + "):" + id) != null) {
             redisService.deleteValues("RT(" + provider + "):" + id); // 삭제
         }
 
         // AT, RT 생성 및 Redis에 RT 저장
-        TokenDto tokenDto =  jwtProvider.createToken(id, authorities);
+        TokenDto tokenDto = jwtProvider.createToken(id, authorities);
         saveRefreshToken(provider, id, tokenDto.getRefreshToken());
         return tokenDto;
     }
@@ -98,12 +102,14 @@ public class AuthService {
                 refreshToken, // value
                 jwtProvider.getTokenExpirationTime(refreshToken)); // timeout(milliseconds)
     }
+
     // 권한 이름 가져오기
     public String getAuthorities(Authentication authentication) {
         return authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
     }
+
     // AT로부터 principal 추출
     public String getPrincipal(String requestAccessToken) {
         return jwtProvider.getAuthentication(requestAccessToken).getName();

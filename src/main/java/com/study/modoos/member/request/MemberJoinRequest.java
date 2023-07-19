@@ -23,12 +23,12 @@ public class MemberJoinRequest {
     private String email;
     private String campus;
 
-    public Member joinMember(PasswordEncoder passwordEncoder){
+    public Member joinMember(PasswordEncoder passwordEncoder) {
         return Member.builder()
                 .nickname(nickname)
                 .password(passwordEncoder.encode(password))
                 .email(email)
-                .campus(Campus.of(campus))
+                .campus(Campus.valueOf(campus))
                 .build();
     }
 
