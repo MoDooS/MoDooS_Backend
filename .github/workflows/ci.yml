@@ -9,9 +9,9 @@ on:
 # flow에서 사용할 변수 같은 느낌입니다.
 env:
   AWS_REGION:  ap-northeast-2
-  S3_BUCKET_NAME: my-github-action-s3-bucket1
-  CODE_DEPLOY_APPLICATION_NAME: my-codedeploy-app
-  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: my-codedeploy-deployment-group
+  S3_BUCKET_NAME: modustudy-s3
+  CODE_DEPLOY_APPLICATION_NAME: ModuStudy
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: modustudy-deploy
 #   working-directory: ./프로젝트 경로 # 이 코드는 제 프로젝트 경로를 맞춰주기 위해 적어주었습니다. 필요하시면 적으세요 !
 
 permissions:
