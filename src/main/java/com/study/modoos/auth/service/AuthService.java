@@ -8,6 +8,7 @@ import com.study.modoos.common.exception.ErrorCode;
 import com.study.modoos.common.exception.ModoosException;
 import com.study.modoos.member.entity.Member;
 import com.study.modoos.member.repository.MemberRepository;
+import com.study.modoos.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class AuthService {
     private static final String TOKEN_TYPE = "Bearer";
     private final MemberRepository memberRepository;
+    private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final RedisService redisService;
@@ -140,6 +142,13 @@ public class AuthService {
         redisService.setValuesWithTimeout(requestAccessToken,
                 "logout",
                 expiration);
+    }
+
+    public void changePassword(String email, String password) {
+        if (!memberService.emailCheck(email))
+            throw new ModoosException(ErrorCode.MEMBER_NOT_FOUND);
+        Member member = memberService.findByEmail(email);
+        member.updatePassword(passwordEncoder.encode((password)));
     }
 }
 

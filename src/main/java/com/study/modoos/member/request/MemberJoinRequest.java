@@ -1,6 +1,7 @@
 package com.study.modoos.member.request;
 
 import com.study.modoos.member.entity.Campus;
+import com.study.modoos.member.entity.Department;
 import com.study.modoos.member.entity.Member;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -21,14 +22,16 @@ public class MemberJoinRequest {
     @NotBlank(message = "이메일은 필수 입력값입니다.")
     @Email(message = "이메일 형식이 올바르지 않습니다.")
     private String email;
-    private String campus;
+    private Campus campus;
+    private Department department;
 
     public Member joinMember(PasswordEncoder passwordEncoder) {
         return Member.builder()
                 .nickname(nickname)
                 .password(passwordEncoder.encode(password))
                 .email(email)
-                .campus(Campus.valueOf(campus))
+                .campus(campus)
+                .department(department)
                 .build();
     }
 

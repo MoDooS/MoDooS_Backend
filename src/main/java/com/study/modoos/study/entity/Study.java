@@ -43,6 +43,7 @@ public class Study {
     @Column(name = "participants_count")
     private int participants_count;
 
+    //0이면 모집중, 1이면 모집완료, 2면 스터디 생성 완료
     @ColumnDefault("0")
     @Column(name = "status")
     private int status;
@@ -102,8 +103,8 @@ public class Study {
 
     @Builder
     public Study(Member leader, String title, String description, int recruits_count,
-                 LocalDate recruit_deadline, String channel, LocalDate expected_start_at,
-                 LocalDate expected_end_at, String category, String campus, String contact,
+                 LocalDate recruit_deadline, Channel channel, LocalDate expected_start_at,
+                 LocalDate expected_end_at, Category category, Campus campus, String contact,
                  String link, String rule_content, int absent, int late, int out) {
         this.leader = leader;
         this.title = title;
@@ -111,29 +112,30 @@ public class Study {
         this.recruits_count = recruits_count;
         this.participants_count = 1;
         this.recruit_deadline = recruit_deadline;
-        this.channel = Channel.valueOf(channel);
+        this.channel = channel;
         this.expected_start_at = expected_start_at;
         this.expected_end_at = expected_end_at;
-        this.category = Category.valueOf(category);
-        this.campus = Campus.valueOf(campus);
+        this.category = category;
+        this.campus = campus;
         this.contact = contact;
         this.link = link;
         this.rule_content = rule_content;
         this.absent = absent;
         this.late = late;
         this.out = out;
+        this.status = 0;
     }
 
-    public void update(String campus, String channel, String category, LocalDate expected_start_at,
+    public void update(Campus campus, Channel channel, Category category, LocalDate expected_start_at,
                        LocalDate expected_end_at, String contact, String link, String title, String description,
                        int absent, int late, int out, String rule_content) {
         this.title = title;
         this.description = description;
-        this.channel = Channel.valueOf(channel);
+        this.channel = channel;
         this.expected_start_at = expected_start_at;
         this.expected_end_at = expected_end_at;
-        this.category = Category.valueOf(category);
-        this.campus = Campus.valueOf(campus);
+        this.category = category;
+        this.campus = campus;
         this.contact = contact;
         this.link = link;
         this.rule_content = rule_content;
