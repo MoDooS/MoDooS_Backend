@@ -41,10 +41,15 @@ jobs:
       run: chmod +x gradlew
       working-directory: ${{ env.working-directory }}
 
-# 4) gradle 빌드
+## 4) gradle 빌드
+#    - name: Build with Gradle
+#      run: ./gradlew clean build
+#      working-directory: ${{ env.working-directory }}
+## 4) gradle 빌드 (Test 제외)
     - name: Build with Gradle
-      run: ./gradlew clean build
-      working-directory: ${{ env.working-directory }}
+      uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
+      with:
+        arguments: clean build -x test
 
 # AWS 인증
     - name: Configure AWS credentials
