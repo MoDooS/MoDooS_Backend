@@ -37,6 +37,11 @@ public class Member {
     private Campus campus;
 
     @NotNull
+    @Column(name = "department", length = 30)
+    @Enumerated(EnumType.STRING)
+    private Department department;
+
+    @NotNull
     @Column(name = "ranking", length = 10)
     private String ranking;
 
@@ -51,6 +56,20 @@ public class Member {
     private Role role;
 
 
+    @Builder
+    public Member(String nickname, String password, String email,
+                  Campus campus, Department department) {
+        this.nickname = nickname;
+        this.password = password;
+        this.email = email;
+        this.campus = campus;
+        this.ranking = "B";
+        this.score = 200L;
+        this.isMember = true;
+        this.role = Role.MEMBER;
+        this.department = department;
+    }
+
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
@@ -58,15 +77,12 @@ public class Member {
     public void updateCampus(Campus campus) {
         this.campus = campus;
     }
-    @Builder
-    public Member(String nickname, String password, String email, Campus campus){
-        this.nickname = nickname;
+
+    public void updateDepartment(Department department) {
+        this.department = department;
+    }
+
+    public void updatePassword(String password) {
         this.password = password;
-        this.email = email;
-        this.campus =campus;
-        this.ranking = "B";
-        this.score = 200L;
-        this.isMember = true;
-        this.role = Role.MEMBER;
     }
 }

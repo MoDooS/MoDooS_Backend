@@ -6,6 +6,7 @@ import com.study.modoos.study.entity.Participant;
 import com.study.modoos.study.entity.Study;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
@@ -52,4 +53,18 @@ public class Feedback extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private Negative negative;
+
+    @Builder
+    public Feedback(Study study, Participant receiver, Participant sender, int times,
+                    int attend, int deligence, int participate, Positive positive, Negative negative) {
+        this.study = study;
+        this.receiver = receiver;
+        this.sender = sender;
+        this.times = times;
+        this.attend = attend;
+        this.deligence = deligence;
+        this.participate = participate;
+        this.positive = positive;
+        this.negative = negative;
+    }
 }

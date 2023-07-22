@@ -22,16 +22,13 @@ import java.util.Date;
 @Component
 @Transactional(readOnly = false)
 public class JwtProvider implements InitializingBean {
-    private final PrincipalDetailsService principalDetailsService;
-    private final RedisService redisService;
-
     private static final String AUTHORITIES_KEY = "role";
     private static final String ID_KEY = "id";
     private static final String url = "http://localhost:8080";
-
-    private final String secretKey;
     private static Key signingKey;
-
+    private final PrincipalDetailsService principalDetailsService;
+    private final RedisService redisService;
+    private final String secretKey;
     private final Long accessTokenValidityInMilliseconds;
     private final Long refreshTokenValidityInMilliseconds;
 
@@ -49,6 +46,22 @@ public class JwtProvider implements InitializingBean {
         this.refreshTokenValidityInMilliseconds = refreshTokenValidityInMilliseconds * 1000;
     }
 
+    public static Claims getClaims(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(signingKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) { // Access Token
+            return e.getClaims();
+        }
+    }
+
+    public static long getTokenExpirationTime(String token) {
+        return getClaims(token).getExpiration().getTime();
+    }
+
     // 시크릿 키 설정
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -57,7 +70,7 @@ public class JwtProvider implements InitializingBean {
     }
 
     @Transactional
-    public TokenDto createToken(String id, String authorities){
+    public TokenDto createToken(String id, String authorities) {
         Long now = System.currentTimeMillis();
 
         String accessToken = Jwts.builder()
@@ -82,29 +95,13 @@ public class JwtProvider implements InitializingBean {
         return new TokenDto(accessToken, refreshToken);
     }
 
-    public static Claims getClaims(String token) {
-        try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(signingKey)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-        } catch (ExpiredJwtException e) { // Access Token
-            return e.getClaims();
-        }
-    }
-
     public Authentication getAuthentication(String token) {
         String id = getClaims(token).get(ID_KEY).toString();
         PrincipalDetails principalDetails = principalDetailsService.loadUserByUsername(id);
         return new UsernamePasswordAuthenticationToken(principalDetails, "", principalDetails.getAuthorities());
     }
 
-    public static long getTokenExpirationTime(String token) {
-        return getClaims(token).getExpiration().getTime();
-    }
-
-    public boolean validateRefreshToken(String refreshToken){
+    public boolean validateRefreshToken(String refreshToken) {
         try {
             if (redisService.getValues(refreshToken).equals("delete")) { // 회원 탈퇴했을 경우
                 return false;
@@ -124,7 +121,7 @@ public class JwtProvider implements InitializingBean {
             log.error("Unsupported JWT token.");
         } catch (IllegalArgumentException e) {
             log.error("JWT claims string is empty.");
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             log.error("JWT Token is empty.");
         }
         return false;
@@ -142,7 +139,7 @@ public class JwtProvider implements InitializingBean {
                     .build()
                     .parseClaimsJws(accessToken);
             return true;
-        } catch(ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
             return true;
         } catch (Exception e) {
             return false;
@@ -155,7 +152,7 @@ public class JwtProvider implements InitializingBean {
             return getClaims(accessToken)
                     .getExpiration()
                     .before(new Date());
-        } catch(ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
             return true;
         } catch (Exception e) {
             return false;

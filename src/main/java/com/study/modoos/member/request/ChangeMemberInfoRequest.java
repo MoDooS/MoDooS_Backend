@@ -1,5 +1,7 @@
 package com.study.modoos.member.request;
 
+import com.study.modoos.member.entity.Campus;
+import com.study.modoos.member.entity.Department;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,8 +9,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberInfoRequest {
+public class ChangeMemberInfoRequest {
     private String nickname;
 
-    private String campus;
+    private Campus campus;
+
+    private Department department;
 }
