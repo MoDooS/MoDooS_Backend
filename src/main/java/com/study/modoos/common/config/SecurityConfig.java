@@ -22,10 +22,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    private static final String API_PREFIX = "/api";
     private final JwtProvider jwtTokenProvider;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private static final String API_PREFIX = "/api";
 
     public SecurityConfig(JwtProvider jwtTokenProvider, JwtAccessDeniedHandler jwtAccessDeniedHandler, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
         this.jwtTokenProvider = jwtTokenProvider;
@@ -45,22 +45,25 @@ public class SecurityConfig {
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .exceptionHandling((exceptionHandling) ->
-                        exceptionHandling
-                                .authenticationEntryPoint(jwtAuthenticationEntryPoint) //401 에러 핸들링
-                                .accessDeniedHandler(jwtAccessDeniedHandler)  //403 에러 핸들링
+                                exceptionHandling
+                                        .authenticationEntryPoint(jwtAuthenticationEntryPoint) //401 에러 핸들링
+                                        .accessDeniedHandler(jwtAccessDeniedHandler)  //403 에러 핸들링
 //                                .accessDeniedPage("/errors/access-denied") // 접근 제한 페이지
                 )
                 .authorizeHttpRequests((authorizeRequests) ->
                         authorizeRequests.requestMatchers(
-                                API_PREFIX + "/member/join",
-                                API_PREFIX + "/member/nickname-check",
+                                        API_PREFIX + "/member/join",
+                                        API_PREFIX + "/member/nickname-check",
                                         API_PREFIX + "/auth/login",
-                                        API_PREFIX + "/auth/email-confirm")
+                                        API_PREFIX + "/auth/email-confirm",
+                                        API_PREFIX + "/auth/email-check",
+                                        API_PREFIX + "/auth/changePw")
                                 .permitAll())
-                .authorizeHttpRequests((authorizeRequests)-> authorizeRequests.anyRequest().authenticated())
+                .authorizeHttpRequests((authorizeRequests) -> authorizeRequests.anyRequest().authenticated())
                 .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -72,7 +75,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtFilter jwtFilter(){
+    public JwtFilter jwtFilter() {
         return new JwtFilter(jwtTokenProvider);
     }
 }

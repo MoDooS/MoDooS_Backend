@@ -25,24 +25,7 @@ public class RecruitService {
     @Transactional
     public RecruitResponse postRecruit(Member currentMember, RecruitRequest request) {
 
-        Study study = Study.builder()
-                .leader(currentMember)
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .recruits_count(request.getRecruits_count())
-                .recruit_deadline(request.getRecruit_deadline())
-                .channel(request.getChannel())
-                .expected_start_at(request.getExpected_start_at())
-                .expected_end_at(request.getExpected_end_at())
-                .category(request.getCategory())
-                .campus(request.getCampus())
-                .contact(request.getContact())
-                .link(request.getLink())
-                .late(request.getLate())
-                .absent(request.getAbsent())
-                .out(request.getOut())
-                .rule_content(request.getRule_content())
-                .build();
+        Study study = request.createRecruit(currentMember);
 
         Study saved = studyRepository.save(study);
 
@@ -57,21 +40,36 @@ public class RecruitService {
             throw new ModoosException(ErrorCode.FORBIDDEN_ARTICLE);
         }
 
+        //스터디가 이미 생성된 모집공고면 삭제 불가능
+        if (study.getStatus() == 2) {
+            throw new ModoosException(ErrorCode.STUDY_NOT_EDIT);
+        }
+
         study.update(request.getCampus(), request.getChannel(), request.getCategory(),
                 request.getExpected_start_at(), request.getExpected_end_at(), request.getContact(),
                 request.getRule_content(), request.getTitle(), request.getDescription(),
                 request.getAbsent(), request.getLate(), request.getOut(), request.getRule_content());
 
+
+        studyRepository.save(study);
         return RecruitResponse.of(study, true);
     }
 
     @Transactional
     public void deleteRecruit(Member currentMember, Long recruitId) {
         Study study = entityFinder.findStudy(recruitId);
+
+        //로그인한 유저와 글 작성자가 다르면 예외
         if (!currentMember.getId().equals(study.getLeader().getId())) {
             throw new ModoosException(ErrorCode.FORBIDDEN_ARTICLE);
         }
 
+        //스터디가 이미 생성된 모집공고면 삭제 불가능
+        if (study.getStatus() == 2) {
+            throw new ModoosException(ErrorCode.STUDY_NOT_EDIT);
+        }
         studyRepository.delete(study);
     }
+
+
 }

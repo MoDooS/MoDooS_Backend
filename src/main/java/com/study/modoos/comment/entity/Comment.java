@@ -4,10 +4,7 @@ import com.study.modoos.common.entity.BaseTimeEntity;
 import com.study.modoos.member.entity.Member;
 import com.study.modoos.study.entity.Study;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
@@ -49,7 +46,17 @@ public class Comment extends BaseTimeEntity {
     @OneToMany(mappedBy = "parent", orphanRemoval = true)
     private List<Comment> children = new ArrayList<>();
 
-    public void update(Comment comment, String content) {
+    @Builder
+    public Comment(Study study, Member writer, String content, Boolean isDeleted,
+                   Comment parent) {
+        this.study = study;
+        this.writer = writer;
+        this.content = content;
+        this.isDeleted = isDeleted;
+        this.parent = parent;
+    }
+
+    public void updateContent(String content) {
         this.content = content;
     }
 

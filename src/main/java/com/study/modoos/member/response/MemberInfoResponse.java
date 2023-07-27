@@ -1,5 +1,7 @@
 package com.study.modoos.member.response;
 
+import com.study.modoos.member.entity.Campus;
+import com.study.modoos.member.entity.Department;
 import com.study.modoos.member.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +18,9 @@ public class MemberInfoResponse {
 
     private String email;
 
-    private String campus;
+    private Campus campus;
+
+    private Department department;
 
     private String ranking;
 
@@ -26,7 +30,8 @@ public class MemberInfoResponse {
         return MemberInfoResponse.builder()
                 .nickname(member.getNickname())
                 .email(member.getEmail())
-                .campus(member.getCampus().getCampusName())
+                .campus(member.getCampus())
+                .department(member.getDepartment())
                 .ranking(member.getRanking())
                 .score(member.getScore())
                 .build();

@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ErrorCode {
     STUDY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 스터디를 찾지 못했습니다.", "요청한 스터디가 유효한지 확인해주세요"),
+    STUDY_NOT_EDIT(HttpStatus.NOT_FOUND, "해당 스터디는 이미 생성 완료되었습니다.", "생성 완료된 스터디는 수정, 또는 삭제할 수 없습니다. 스터디가 유효한지 확인해주세요."),
     RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "스터디와 연결된 규칙 정보를 찾지 못했습니다.", "요청한 스터디의 규칙 정보가 유효한지 확인해주세요"),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저 정보를 찾지 못했습니다.", "email 과 password 를 올바르게 입력했는지 확인해주세요"),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "email 또는 비밀번호가 맞지 않습니다.", "다른 이메일 또는 비밀번호를 사용해야합니다."),
