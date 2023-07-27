@@ -148,7 +148,8 @@ public class AuthService {
         if (!memberService.emailCheck(email))
             throw new ModoosException(ErrorCode.MEMBER_NOT_FOUND);
         Member member = memberService.findByEmail(email);
-        member.updatePassword(passwordEncoder.encode((password)));
+        member.updatePassword(passwordEncoder.encode(password));
+        memberRepository.save(member);
     }
 }
 
