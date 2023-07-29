@@ -57,7 +57,8 @@ public class SecurityConfig {
                                         API_PREFIX + "/auth/login",
                                         API_PREFIX + "/auth/email-confirm",
                                         API_PREFIX + "/auth/email-check",
-                                        API_PREFIX + "/auth/changePw")
+                                        API_PREFIX + "/auth/changePw",
+                                        API_PREFIX + "/health-check")
                                 .permitAll())
                 .authorizeHttpRequests((authorizeRequests) -> authorizeRequests.anyRequest().authenticated())
                 .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
