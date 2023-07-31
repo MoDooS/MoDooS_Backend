@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthService authService;
@@ -28,7 +28,7 @@ public class AuthController {
     private final EmailService emailService;
 
 
-    @PostMapping("/login")
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest loginRequest,
                                                HttpServletResponse response) {
         // User 등록 및 Refresh Token 저장
