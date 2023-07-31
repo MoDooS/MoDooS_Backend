@@ -58,8 +58,8 @@ public class SecurityConfig {
                                         API_PREFIX + "/auth/email-confirm",
                                         API_PREFIX + "/auth/email-check",
                                         API_PREFIX + "/auth/changePw")
-                                .permitAll())
-                .authorizeHttpRequests((authorizeRequests) -> authorizeRequests.anyRequest().authenticated())
+                                .permitAll()
+                                .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
