@@ -7,6 +7,7 @@ import com.study.modoos.auth.service.AuthService;
 import com.study.modoos.auth.service.EmailService;
 import com.study.modoos.common.response.NormalResponse;
 import com.study.modoos.member.service.MemberService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final MemberService memberService;
-    private final long COOKIE_EXPIRATION = 7776000; // 90일
+    private final int COOKIE_EXPIRATION = 7776000; // 90일
     private final EmailService emailService;
 
 
@@ -33,20 +34,24 @@ public class AuthController {
         // User 등록 및 Refresh Token 저장
         LoginResponse loginResponse = authService.login(loginRequest);
 
-        // Refresh Token을 HttpOnly 쿠키에 저장하여 프론트엔드로 전달
-        ResponseCookie responseCookie = ResponseCookie.from("refresh-token", loginResponse.getRefreshToken())
-                .maxAge(COOKIE_EXPIRATION)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .build();
+        // Refresh Token을 HttpOnly 쿠키에 저장하여 전달
+        Cookie refreshTokenCookie = new Cookie("refresh-token", loginResponse.getRefreshToken());
+        refreshTokenCookie.setMaxAge(COOKIE_EXPIRATION);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setPath("/");
+        response.addCookie(refreshTokenCookie);
 
-        // Access Token과 TokenType을 함께 헤더에 담아서 전송
-        response.setHeader(HttpHeaders.AUTHORIZATION, loginResponse.getTokenType() + " " + loginResponse.getAccessToken());
+        // Access Token을 HttpOnly 쿠키에 담아서 전송
+        Cookie accessTokenCookie = new Cookie("access-token", loginResponse.getAccessToken());
+        accessTokenCookie.setMaxAge(COOKIE_EXPIRATION);
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setSecure(true);
+        accessTokenCookie.setPath("/");
+        response.addCookie(accessTokenCookie);
 
-        // 쿠키와 Access Token을 함께 응답
+        // 응답
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
                 .build();
     }
 
