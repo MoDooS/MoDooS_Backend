@@ -8,7 +8,7 @@ on:
 
 # flow에서 사용할 변수 같은 느낌입니다.
 env:
-  AWS_REGION:  ap-northeast-2
+  AWS_REGION: ap-northeast-2
   S3_BUCKET_NAME: modustudy-s3
   CODE_DEPLOY_APPLICATION_NAME: ModuStudy
   CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: modustudy-deploy-group
@@ -23,67 +23,61 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
 
-# 아래의 flow들이 차례대로 실행됩니다.
+    # 아래의 flow들이 차례대로 실행됩니다.
     steps:
-# 1) 기본 체크아웃
-    - name: Checkout
-      uses: actions/checkout@v3
-   
-     # 이전에 생성된 Querydsl 클래스들을 제거
-    - run: ./gradlew cleanQuerydslSourceDir
+      # 1) 기본 체크아웃
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    # 새로운 Querydsl 클래스들을 생성
-    - run: ./gradlew generateQuerydsl
+      # 2) JDK 17 셋팅
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-# 2) JDK 17 셋팅
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
+      - run: mkdir -p ./src/main/resources
+      - run: touch ./src/main/resources/application.properties
+      - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
+      - run: cat ./src/main/resources/application.properties
 
-    - run: mkdir -p ./src/main/resources
-    - run: touch ./src/main/resources/application.properties
-    - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
-    - run: cat ./src/main/resources/application.properties
+      # 3) gradlew 권한 설정
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        working-directory: ${{ env.working-directory }}
 
-# 3) gradlew 권한 설정
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-      working-directory: ${{ env.working-directory }}
+      ## 4) gradle 빌드
+      #    - name: Build with Gradle
+      #      run: ./gradlew clean build
+      #      working-directory: ${{ env.working-directory }}
+      ## 4) gradle 빌드 (Test 제외)
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
+        with:
+          arguments: clean build -x test
 
-## 4) gradle 빌드
-#    - name: Build with Gradle
-#      run: ./gradlew clean build
-#      working-directory: ${{ env.working-directory }}
-## 4) gradle 빌드 (Test 제외)
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
-      with:
-        arguments: clean build -x test
+      # AWS 인증
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-# AWS 인증
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+      # AWS S3에 업로드
+      - name: Upload to AWS S3
+        run: |
+          aws deploy push \
+            --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+            --ignore-hidden-files \
+            --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
+            --source .
 
-# AWS S3에 업로드
-    - name: Upload to AWS S3
-      run: |
-        aws deploy push \
-          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
-          --ignore-hidden-files \
-          --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
-          --source .
-
-# AWS EC2에 Deploy
-    - name: Deploy to AWS EC2 from S3
-      run: |
-        aws deploy create-deployment \
-          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
-          --deployment-config-name CodeDeployDefault.AllAtOnce \
-          --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-          --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
+      # AWS EC2에 Deploy
+      - name: Deploy to AWS EC2 from S3
+        run: |
+          aws deploy create-deployment \
+            --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
+            --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
