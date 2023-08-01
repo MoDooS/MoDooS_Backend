@@ -1,64 +1,112 @@
+buildscript {
+    ext {
+        queryDslVersion = "5.0.0"
+    }
+}
+
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.1.1'
-	id 'io.spring.dependency-management' version '1.1.0'
+    id 'java'
+    id 'org.springframework.boot' version '3.1.1'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"    //query dsl
 }
 
 group = 'com.study'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	sourceCompatibility = '17'
+    sourceCompatibility = '17'
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 jar {
-	enabled = false
+    enabled = false
 }
 
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation'org.springframework.boot:spring-boot-starter-validation'
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-	// SpringSecurity
-	implementation 'org.springframework.boot:spring-boot-starter-security:3.0.4'
-	testImplementation 'org.springframework.security:spring-security-test'
+    // SpringSecurity
+    implementation 'org.springframework.boot:spring-boot-starter-security:3.0.4'
+    testImplementation 'org.springframework.security:spring-security-test'
 
-	//Redis
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
-
-	//io.jsonwebtoken : jwt
-	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    //Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 
-	// com.sun.xml.bind : jwt
-	implementation 'com.sun.xml.bind:jaxb1-impl:2.2.5.1'
-	implementation 'com.sun.xml.bind:jaxb-core:4.0.2'
-	// javax.xml.bind : jwt
-	implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
+    //io.jsonwebtoken : jwt
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-	//email
-	implementation 'org.springframework.boot:spring-boot-starter-mail:3.0.4'
+
+    // com.sun.xml.bind : jwt
+    implementation 'com.sun.xml.bind:jaxb1-impl:2.2.5.1'
+    implementation 'com.sun.xml.bind:jaxb-core:4.0.2'
+    // javax.xml.bind : jwt
+    implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
+
+    //email
+    implementation 'org.springframework.boot:spring-boot-starter-mail:3.0.4'
+
+    //QueryDsl
+    // querydsl
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
+    annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
+    //java.lang.NoClassDefFoundError 대응
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api:3.1.0"
+
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
+}
+
+//querydsl 사용 경로
+def querydslDir = "src/main/generated"
+
+//querydsl 사용 설정
+querydsl {
+    jpa = true
+    querydslSourcesDir = querydslDir
+}
+
+// build 시 사용할 sourceSet
+sourceSets {
+    main.java.srcDir querydslDir
+}
+
+// compileClasspath와 annotationProcessor 상속
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
+}
+
+//feature/improve-all
+// querydsl 컴파일 시 사용할 옵션.
+compileQuerydsl {
+    options.annotationProcessorPath = configurations.querydsl
+}
+
+clean {
+    delete file(querydslDir)
 }

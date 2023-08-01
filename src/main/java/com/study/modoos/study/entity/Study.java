@@ -1,5 +1,6 @@
 package com.study.modoos.study.entity;
 
+import com.study.modoos.common.entity.BaseTimeEntity;
 import com.study.modoos.member.entity.Campus;
 import com.study.modoos.member.entity.Member;
 import jakarta.persistence.*;
@@ -17,7 +18,7 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "study")
-public class Study {
+public class Study extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -142,6 +143,10 @@ public class Study {
         this.absent = absent;
         this.late = late;
         this.out = out;
+    }
+
+    public boolean isWrittenPost(Member member) {
+        return this.leader.getId().equals(member.getId());
     }
 
     /*
