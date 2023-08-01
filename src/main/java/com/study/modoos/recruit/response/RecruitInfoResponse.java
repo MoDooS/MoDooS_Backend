@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RecruitResponse {
+public class RecruitInfoResponse {
     private Long id;
 
     private Long leader_id;
@@ -52,8 +52,8 @@ public class RecruitResponse {
 
     private boolean isWritten;
 
-    public static RecruitResponse of(Study study, boolean isWritten) {
-        return RecruitResponse.builder()
+    public static RecruitInfoResponse of(Study study, boolean isWritten) {
+        return RecruitInfoResponse.builder()
                 .id(study.getId())
                 .leader_id(study.getLeader().getId())
                 .leader_nickname(study.getLeader().getNickname())

@@ -7,12 +7,20 @@ import com.study.modoos.member.entity.Member;
 import com.study.modoos.member.repository.MemberRepository;
 import com.study.modoos.recruit.request.ChangeRecruitRequest;
 import com.study.modoos.recruit.request.RecruitRequest;
-import com.study.modoos.recruit.response.RecruitResponse;
+import com.study.modoos.recruit.response.RecruitIdResponse;
+import com.study.modoos.recruit.response.RecruitInfoResponse;
+import com.study.modoos.study.entity.Category;
 import com.study.modoos.study.entity.Study;
 import com.study.modoos.study.repository.StudyRepository;
+import com.study.modoos.study.repository.StudyRepositoryImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -20,20 +28,38 @@ import org.springframework.transaction.annotation.Transactional;
 public class RecruitService {
     private final MemberRepository memberRepository;
     private final StudyRepository studyRepository;
+    private final StudyRepositoryImpl studyRepositoryImpl;
     private final EntityFinder entityFinder;
 
     @Transactional
-    public RecruitResponse postRecruit(Member currentMember, RecruitRequest request) {
-
+    public RecruitIdResponse postRecruit(Member currentMember, RecruitRequest request) {
         Study study = request.createRecruit(currentMember);
+        studyRepository.save(study);
+        return RecruitIdResponse.of(study);
+    }
 
-        Study saved = studyRepository.save(study);
+    public RecruitInfoResponse oneRecruit(Member currentMember, Long id) {
+        Study study = studyRepository.findById(id)
+                .orElseThrow(() -> new ModoosException(ErrorCode.STUDY_NOT_FOUND));
 
-        return RecruitResponse.of(saved, true);
+        if (study.getLeader().getId().equals(currentMember.getId())) {
+            return RecruitInfoResponse.of(study, true);
+        }
+        return RecruitInfoResponse.of(study, false);
+    }
+
+    public Slice<RecruitInfoResponse> getRecruitList(Member member, String search, List<String> categoryList, Pageable pageable) {
+
+        List<Category> categories = new ArrayList<>();
+
+        for (String s : categoryList) {
+            categories.add(Category.resolve(s));
+        }
+        return studyRepositoryImpl.getSliceOfRecruit(member, search, categories, pageable);
     }
 
     @Transactional
-    public RecruitResponse changeRecruit(Member currentMember, Long recruitId, ChangeRecruitRequest request) {
+    public RecruitIdResponse changeRecruit(Member currentMember, Long recruitId, ChangeRecruitRequest request) {
         Study study = entityFinder.findStudy(recruitId);
 
         if (!currentMember.getId().equals(study.getLeader().getId())) {
@@ -52,7 +78,7 @@ public class RecruitService {
 
 
         studyRepository.save(study);
-        return RecruitResponse.of(study, true);
+        return RecruitIdResponse.of(study);
     }
 
     @Transactional
@@ -71,5 +97,8 @@ public class RecruitService {
         studyRepository.delete(study);
     }
 
+    public Long findMaxRecruitIdx() {
+        return studyRepositoryImpl.findMaxRecruitIdx().getId();
+    }
 
 }

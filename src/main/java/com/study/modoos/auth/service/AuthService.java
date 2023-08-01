@@ -145,11 +145,8 @@ public class AuthService {
     }
 
     public void changePassword(String email, String password) {
-        if (!memberService.emailCheck(email))
-            throw new ModoosException(ErrorCode.MEMBER_NOT_FOUND);
-        Member member = memberService.findByEmail(email);
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_FOUND));
         member.updatePassword(passwordEncoder.encode(password));
-        memberRepository.save(member);
     }
 }
 
