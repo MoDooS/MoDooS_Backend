@@ -28,6 +28,12 @@ jobs:
 # 1) 기본 체크아웃
     - name: Checkout
       uses: actions/checkout@v3
+   
+     # 이전에 생성된 Querydsl 클래스들을 제거
+    - run: ./gradlew cleanQuerydslSourceDir
+
+    # 새로운 Querydsl 클래스들을 생성
+    - run: ./gradlew generateQuerydsl
 
 # 2) JDK 17 셋팅
     - name: Set up JDK 17
