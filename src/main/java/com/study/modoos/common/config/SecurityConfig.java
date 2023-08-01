@@ -60,7 +60,7 @@ public class SecurityConfig {
                                         API_PREFIX + "/auth/login",
                                         API_PREFIX + "/auth/email-confirm",
                                         API_PREFIX + "/auth/email-check",
-                                     
+                                        API_PREFIX + "/recruit/posts",
                                         API_PREFIX + "/auth/changePw",
                                         API_PREFIX + "/health-check")
                                 .permitAll()
