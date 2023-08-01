@@ -2,3 +2,5 @@ application.properties
 .idea/*
 build/
 src/main/generated/
+src/querydsl/generated
+
