@@ -1,5 +1,6 @@
 package com.study.modoos.study.entity;
 
+import com.study.modoos.comment.entity.Comment;
 import com.study.modoos.common.entity.BaseTimeEntity;
 import com.study.modoos.member.entity.Campus;
 import com.study.modoos.member.entity.Member;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -101,6 +103,10 @@ public class Study extends BaseTimeEntity {
     @ColumnDefault("0")
     @Column(name = "total_turn")
     private int total_turn;
+
+    @OneToMany(mappedBy = "study", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @OrderBy("id asc")
+    private List<Comment> comments;
 
     @Builder
     public Study(Member leader, String title, String description, int recruits_count,
