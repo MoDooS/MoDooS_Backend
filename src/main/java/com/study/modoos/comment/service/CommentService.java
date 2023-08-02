@@ -53,9 +53,12 @@ public class CommentService {
         comment.updateContent(commentRequest.getContent());
     }
 
-    public void deleteComment(Member currentUser, Long commentId, CommentRequest commentRequest) {
+    public void deleteComment(Member currentUser, Long commentId) {
         Comment comment = commentRepository.findCommentByIdWithParent(commentId)
                 .orElseThrow(() -> new ModoosException(ErrorCode.COMMENT_NOT_FOUND));
+        if (!currentUser.getId().equals(comment.getWriter().getId())) {
+            throw new ModoosException(ErrorCode.INVALID_DELETE);
+        }
         if (comment.getChildren().size() != 0) {
             comment.changeIsDeleted(true);
         } else {

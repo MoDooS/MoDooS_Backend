@@ -18,6 +18,7 @@ public enum ErrorCode {
     VALUE_NOT_IN_OPTION(HttpStatus.BAD_REQUEST, "선택지에 없는 값을 사용했습니다.", "선택지에 있는 값을 사용해야 합니다."),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 comment id 입니다.","올바른 comment id 인지 확인해주세요."),
     INVALID_WRITER(HttpStatus.UNAUTHORIZED, "댓글 작성자와 호출자(현재 사용자)의 정보가 다릅니다" ,"댓글 작성자를 확인해주세요" ),
+    INVALID_DELETE(HttpStatus.UNAUTHORIZED,"댓글 삭제자와 호출자(현재 사용자)의 정보가 다릅니다.", "댓글 삭제자를 확인해주세요"),
     INVALID_PARENT_ID(HttpStatus.UNAUTHORIZED, "부모 댓글의 스터디 공고글과 현재 작성하는 스터디 공고글이 다릅니다." , "부모 댓글 id를 확인해주세요" );
 
     private final HttpStatus httpStatus;
