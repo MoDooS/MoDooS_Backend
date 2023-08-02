@@ -33,6 +33,9 @@ public class CommentService {
         if (commentRequest.getParentId() != null) {
             parentComment = commentRepository.findById(commentRequest.getParentId())
                     .orElseThrow(() -> new ModoosException(ErrorCode.COMMENT_NOT_FOUND));
+            if (!parentComment.getStudy().equals(recruit)){
+                throw new ModoosException(ErrorCode.INVALID_PARENT_ID);
+            }
             comment.updateParent(parentComment);
         }
         comment.updateWriter(currentUser);
