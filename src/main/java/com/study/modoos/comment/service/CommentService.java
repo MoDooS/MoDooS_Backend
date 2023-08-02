@@ -24,6 +24,12 @@ public class CommentService {
     private final StudyRepository studyRepository;
     private final CommentRequestMapper commentRequestMapper;
 
+    public List<CommentResponse> getComment(Long recruitId) {
+        Study recruit = studyRepository.findById(recruitId)
+                .orElseThrow(() -> new ModoosException(ErrorCode.STUDY_NOT_FOUND));
+        return commentRepository.findByStudyId(recruit.getId());
+    }
+
     public void insertComment(Member currentUser, Long recruitId, CommentRequest commentRequest) {
         Study recruit = studyRepository.findById(recruitId)
                 .orElseThrow(() -> new ModoosException(ErrorCode.STUDY_NOT_FOUND));
@@ -72,11 +78,5 @@ public class CommentService {
             // 부모가 있고, 부모의 자식이 1개(지금 삭제하는 댓글)이고, 부모의 삭제 상태가 TRUE인 댓글이라면 재귀
             return getDeletableAncestorComment(parent);
         return comment; // 삭제해야하는 댓글 반환
-    }
-
-    public List<CommentResponse> getComment(Long recruitId) {
-        Study recruit = studyRepository.findById(recruitId)
-                .orElseThrow(() -> new ModoosException(ErrorCode.STUDY_NOT_FOUND));
-        return commentRepository.findByStudyId(recruit.getId());
     }
 }
