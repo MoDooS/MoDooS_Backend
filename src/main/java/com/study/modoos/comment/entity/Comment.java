@@ -60,6 +60,22 @@ public class Comment extends BaseTimeEntity {
         this.content = content;
     }
 
+    public void updateWriter(Member member) {
+        this.writer = member;
+    }
+
+    public void updateStudy(Study study) {
+        this.study = study;
+    }
+
+    public void updateParent(Comment comment) {
+        this.parent = comment;
+    }
+
+    public void changeIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -72,4 +88,5 @@ public class Comment extends BaseTimeEntity {
     public int hashCode() {
         return Objects.hash(id);
     }
+
 }

@@ -7,6 +7,7 @@ import com.study.modoos.auth.jwt.JwtFilter;
 import com.study.modoos.auth.jwt.JwtProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -63,6 +64,9 @@ public class SecurityConfig {
                                         API_PREFIX + "/recruit/posts",
                                         API_PREFIX + "/auth/changePw",
                                         API_PREFIX + "/health-check")
+                                .permitAll()
+                                .requestMatchers(
+                                        HttpMethod.GET,API_PREFIX + "/comment/**")
                                 .permitAll()
                                 .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
