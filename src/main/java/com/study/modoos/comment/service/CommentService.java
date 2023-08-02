@@ -47,7 +47,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ModoosException(ErrorCode.COMMENT_NOT_FOUND));
 
-        if (!currentUser.equals(comment.getWriter().getId())) {
+        if (!currentUser.getId().equals(comment.getWriter().getId())) {
             throw new ModoosException(ErrorCode.INVALID_WRITER);
         }
         comment.updateContent(commentRequest.getContent());
