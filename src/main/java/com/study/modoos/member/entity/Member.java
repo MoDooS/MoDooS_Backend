@@ -83,6 +83,11 @@ public class Member {
         this.department = writer.getDepartment();
     }
 
+    public Member(Long writerId, String writerNickname) {
+        this.id = writerId;
+        this.nickname = writerNickname;
+    }
+
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }

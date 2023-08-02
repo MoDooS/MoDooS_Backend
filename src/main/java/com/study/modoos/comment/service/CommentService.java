@@ -51,7 +51,7 @@ public class CommentService {
     }
 
     public void deleteComment(Member currentUser, Long commentId, CommentRequest commentRequest) {
-        Comment comment = commentRepository.findById(commentId)
+        Comment comment = commentRepository.findCommentByIdWithParent(commentId)
                 .orElseThrow(() -> new ModoosException(ErrorCode.COMMENT_NOT_FOUND));
         if (comment.getChildren().size() != 0) {
             comment.changeIsDeleted(true);

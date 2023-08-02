@@ -25,16 +25,16 @@ public class CommentRepositoryImpl implements CommentCustomRepository{
                         comment.createdAt.asc())
                 .fetch();
 
-        List<CommentResponse> commentResponseDTOList = new ArrayList<>();
-        Map<Long, CommentResponse> commentDTOHashMap = new HashMap<>();
+        List<CommentResponse> commentResponseList = new ArrayList<>();
+        Map<Long, CommentResponse> commentHashMap = new HashMap<>();
 
         comments.forEach(c -> {
-            CommentResponse commentResponseDTO = CommentResponse.convertCommentToDto(c);
-            commentDTOHashMap.put(commentResponseDTO.getId(), commentResponseDTO);
-            if (c.getParent() != null) commentDTOHashMap.get(c.getParent().getId()).getChildren().add(commentResponseDTO);
-            else commentResponseDTOList.add(commentResponseDTO);
+            CommentResponse commentResponse = CommentResponse.convertCommentToDto(c);
+            commentHashMap.put(commentResponse.getId(), commentResponse);
+            if (c.getParent() != null) commentHashMap.get(c.getParent().getId()).getChildren().add(commentResponse);
+            else commentResponseList.add(commentResponse);
         });
-        return commentResponseDTOList;
+        return commentResponseList;
     }
 
     @Override
