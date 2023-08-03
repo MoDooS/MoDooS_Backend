@@ -4,6 +4,7 @@ import com.study.modoos.common.exception.ErrorCode;
 import com.study.modoos.common.exception.ModoosException;
 import com.study.modoos.member.entity.Member;
 import com.study.modoos.member.repository.MemberRepository;
+import com.study.modoos.participant.entity.Participant;
 import com.study.modoos.participant.entity.Standby;
 import com.study.modoos.participant.repository.ParticipantRepostiory;
 import com.study.modoos.participant.repository.StandbyRepository;
@@ -38,5 +39,22 @@ public class ParticipantService {
         }
         Standby standby = new Standby(currentUser, study);
         standbyRepository.save(standby);
+    }
+
+    public void acceptApplication(Member member, Long standbyId) {
+        Member currentUser = memberRepository.findById(member.getId())
+                .orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_FOUND));
+        Standby standby = standbyRepository.findById(standbyId)
+                .orElseThrow(() -> new ModoosException(ErrorCode.WAITER_NOT_FOUND));
+        Study study = standby.getStudy();
+        Member applicant  = standby.getMember();
+
+        if (!study.getLeader().equals(currentUser)){
+            throw new ModoosException(ErrorCode.FORBIDDEN_STUDY_ACCEPT);
+        }
+
+        Participant participant = new Participant(applicant, study);
+        participantRepostiory.save(participant);
+        standbyRepository.delete(standby);
     }
 }

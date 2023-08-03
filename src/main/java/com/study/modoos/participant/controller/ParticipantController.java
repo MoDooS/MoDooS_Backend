@@ -20,4 +20,10 @@ public class ParticipantController {
         participantService.applyStudy(member, studyId);
         return ResponseEntity.ok(NormalResponse.success());
     }
+
+    @GetMapping("/accept/{standbyId}")
+    public ResponseEntity<NormalResponse> acceptApplication (@CurrentUser Member member, @PathVariable Long standbyId) {
+        participantService.acceptApplication(member, standbyId);
+        return ResponseEntity.ok(NormalResponse.success());
+    }
 }
