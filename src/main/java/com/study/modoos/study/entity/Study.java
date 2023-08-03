@@ -33,7 +33,7 @@ public class Study extends BaseTimeEntity {
     @Column(nullable = false, length = 100)
     private String title;
 
-    @Column(nullable = false, length = 2000)
+    @Column(length = 2000)
     private String description;
 
     @ColumnDefault("3")
@@ -75,7 +75,7 @@ public class Study extends BaseTimeEntity {
     @Column(name = "link")
     private String link;
 
-    @Column(nullable = false, length = 2000)
+    @Column(length = 2000)
     private String rule_content;
 
     @ColumnDefault("0")
