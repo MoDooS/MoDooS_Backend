@@ -14,12 +14,15 @@ public enum ErrorCode {
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "email 또는 비밀번호가 맞지 않습니다.", "다른 이메일 또는 비밀번호를 사용해야합니다."),
     FORBIDDEN_ARTICLE(HttpStatus.FORBIDDEN, "게시글에 수정, 삭제에 대한 권한이 없습니다.", "잘못된 접근입니다. 입력값을 확인해주세요."),
     ALREADY_MEMBER(HttpStatus.CONFLICT, "이미 존재하는 유저 정보입니다.", "다른 이메일 혹은 닉네임을 사용해야합니다."),
+    ALREADY_PARTICIPANT(HttpStatus.CONFLICT, "해당 스터디에 이미 참여중입니다.", "다른 스터디를 신청해주세요"),
+    ALREADY_STANDBY(HttpStatus.CONFLICT, "해당 스터디에 이미 참여 신청하였습니다." , "다른 스터디 신청해주세요" ),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 만료됐거나 권한이 없습니다.", "토큰을 재발급 받아야합니다."),
     VALUE_NOT_IN_OPTION(HttpStatus.BAD_REQUEST, "선택지에 없는 값을 사용했습니다.", "선택지에 있는 값을 사용해야 합니다."),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 comment id 입니다.","올바른 comment id 인지 확인해주세요."),
     INVALID_WRITER(HttpStatus.UNAUTHORIZED, "댓글 작성자와 호출자(현재 사용자)의 정보가 다릅니다" ,"댓글 작성자를 확인해주세요" ),
     INVALID_DELETE(HttpStatus.UNAUTHORIZED,"댓글 삭제자와 호출자(현재 사용자)의 정보가 다릅니다.", "댓글 삭제자를 확인해주세요"),
-    INVALID_PARENT_ID(HttpStatus.UNAUTHORIZED, "부모 댓글의 스터디 공고글과 현재 작성하는 스터디 공고글이 다릅니다." , "부모 댓글 id를 확인해주세요" );
+    INVALID_PARENT_ID(HttpStatus.UNAUTHORIZED, "부모 댓글의 스터디 공고글과 현재 작성하는 스터디 공고글이 다릅니다." , "부모 댓글 id를 확인해주세요" ),
+    INVALID_STUDY(HttpStatus.NOT_FOUND, "해당 스터디의 참여 인원 정보를 가져올 수 없습니다." , "스터디의 참여인원이 있는지 확인해주세요");
 
     private final HttpStatus httpStatus;
     private final String message;
