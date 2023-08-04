@@ -1,8 +1,8 @@
 package com.study.modoos.participant.controller;
 
 import com.study.modoos.common.CurrentUser;
-import com.study.modoos.common.response.NormalResponse;
 import com.study.modoos.member.entity.Member;
+import com.study.modoos.participant.response.ParticipantResponse;
 import com.study.modoos.participant.response.StandbyResponse;
 import com.study.modoos.participant.service.ParticipantService;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +22,7 @@ public class ParticipantController {
     }
 
     @GetMapping("/accept/{standbyId}")
-    public ResponseEntity<NormalResponse> acceptApplication (@CurrentUser Member member, @PathVariable Long standbyId) {
-        participantService.acceptApplication(member, standbyId);
-        return ResponseEntity.ok(NormalResponse.success());
+    public ResponseEntity<ParticipantResponse> acceptApplication (@CurrentUser Member member, @PathVariable Long standbyId) {
+        return ResponseEntity.ok(participantService.acceptApplication(member, standbyId));
     }
 }

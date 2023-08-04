@@ -6,8 +6,9 @@ import com.study.modoos.member.entity.Member;
 import com.study.modoos.member.repository.MemberRepository;
 import com.study.modoos.participant.entity.Participant;
 import com.study.modoos.participant.entity.Standby;
-import com.study.modoos.participant.repository.ParticipantRepostiory;
+import com.study.modoos.participant.repository.ParticipantRepository;
 import com.study.modoos.participant.repository.StandbyRepository;
+import com.study.modoos.participant.response.ParticipantResponse;
 import com.study.modoos.participant.response.StandbyResponse;
 import com.study.modoos.study.entity.Study;
 import com.study.modoos.study.repository.StudyRepository;
@@ -20,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ParticipantService {
 
-    private final ParticipantRepostiory participantRepostiory;
+    private final ParticipantRepository participantRepository;
     private final StandbyRepository standbyRepository;
     private final MemberRepository memberRepository;
     private final StudyRepository studyRepository;
@@ -30,7 +31,7 @@ public class ParticipantService {
                 .orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_FOUND));
         Study study = studyRepository.findById(studyId)
                 .orElseThrow(() -> new ModoosException(ErrorCode.STUDY_NOT_FOUND));
-        boolean isParticipant = participantRepostiory.existsByStudyAndMember(study, currentUser);
+        boolean isParticipant = participantRepository.existsByStudyAndMember(study, currentUser);
         boolean isStandby = standbyRepository.existsByStudyAndMember(study, currentUser);
         if (isParticipant) {
             throw new ModoosException(ErrorCode.ALREADY_PARTICIPANT);
@@ -44,11 +45,13 @@ public class ParticipantService {
         return StandbyResponse.of(standby_waiter);
     }
 
-    public void acceptApplication(Member member, Long standbyId) {
+    public ParticipantResponse acceptApplication(Member member, Long standbyId) {
         Member currentUser = memberRepository.findById(member.getId())
                 .orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_FOUND));
-        Standby standby = standbyRepository.findById(standbyId)
+        Standby standby = standbyRepository.findWithMemberAndStudyById(standbyId)
                 .orElseThrow(() -> new ModoosException(ErrorCode.WAITER_NOT_FOUND));
+
+
         Study study = standby.getStudy();
         Member applicant  = standby.getMember();
 
@@ -57,7 +60,10 @@ public class ParticipantService {
         }
 
         Participant participant = new Participant(applicant, study);
-        participantRepostiory.save(participant);
+        participantRepository.save(participant);
+        Participant participant_confirm = participantRepository.findByMemberAndStudy(applicant, study);
         standbyRepository.delete(standby);
+
+        return ParticipantResponse.of(participant_confirm);
     }
 }
