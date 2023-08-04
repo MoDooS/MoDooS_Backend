@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class ParticipantResponse {
-    private Long standbyId;
+    private Long participantId;
     private Long memberId;
     private Long studyId;
 
     public static ParticipantResponse of(Participant participant) {
         return ParticipantResponse.builder()
-                .standbyId(participant.getId())
+                .participantId(participant.getId())
                 .memberId(participant.getMember().getId())
                 .studyId(participant.getStudy().getId())
                 .build();

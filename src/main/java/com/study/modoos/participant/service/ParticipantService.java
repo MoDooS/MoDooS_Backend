@@ -31,8 +31,10 @@ public class ParticipantService {
                 .orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_FOUND));
         Study study = studyRepository.findById(studyId)
                 .orElseThrow(() -> new ModoosException(ErrorCode.STUDY_NOT_FOUND));
+
         boolean isParticipant = participantRepository.existsByStudyAndMember(study, currentUser);
         boolean isStandby = standbyRepository.existsByStudyAndMember(study, currentUser);
+
         if (isParticipant) {
             throw new ModoosException(ErrorCode.ALREADY_PARTICIPANT);
         }
@@ -51,7 +53,6 @@ public class ParticipantService {
         Standby standby = standbyRepository.findWithMemberAndStudyById(standbyId)
                 .orElseThrow(() -> new ModoosException(ErrorCode.WAITER_NOT_FOUND));
 
-
         Study study = standby.getStudy();
         Member applicant  = standby.getMember();
 
@@ -65,5 +66,19 @@ public class ParticipantService {
         standbyRepository.delete(standby);
 
         return ParticipantResponse.of(participant_confirm);
+    }
+
+    public void rejectApplication(Member member, Long standbyId) {
+        Member currentUser = memberRepository.findById(member.getId())
+                .orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_FOUND));
+        Standby standby = standbyRepository.findWithMemberAndStudyById(standbyId)
+                .orElseThrow(() -> new ModoosException(ErrorCode.WAITER_NOT_FOUND));
+
+        Study study = standby.getStudy();
+        if (!study.getLeader().equals(currentUser)){
+            throw new ModoosException(ErrorCode.FORBIDDEN_STUDY_ACCEPT);
+        }
+
+        standbyRepository.delete(standby);
     }
 }
