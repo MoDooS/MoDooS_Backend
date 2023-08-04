@@ -159,6 +159,7 @@ public class Study extends BaseTimeEntity {
      * 나중에 여기에 스터디 생성 시 진짜 시작일, 종료일, 회차, 기간 update하는 로직 넣기(생성자 새로 만들지 x)
      */
 
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

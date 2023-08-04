@@ -7,6 +7,7 @@ import com.study.modoos.recruit.request.ChangeRecruitRequest;
 import com.study.modoos.recruit.request.RecruitRequest;
 import com.study.modoos.recruit.response.RecruitIdResponse;
 import com.study.modoos.recruit.response.RecruitInfoResponse;
+import com.study.modoos.recruit.response.RecruitListInfoResponse;
 import com.study.modoos.recruit.service.RecruitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -36,10 +37,10 @@ public class RecruitController {
     }
 
     @GetMapping("/posts")
-    public ResponseEntity<Slice<RecruitInfoResponse>> getRecruitList(@CurrentUser Member member,
-                                                                     @RequestParam(value = "category", defaultValue = "") List<String> category,
-                                                                     @RequestParam(value = "searchBy", required = false) String search,
-                                                                     @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable) {
+    public ResponseEntity<Slice<RecruitListInfoResponse>> getRecruitList(@CurrentUser Member member,
+                                                                         @RequestParam(value = "category", defaultValue = "") List<String> category,
+                                                                         @RequestParam(value = "searchBy", required = false) String search,
+                                                                         @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable) {
 
         return ResponseEntity.ok(recruitService.getRecruitList(member, search, category, pageable));
 
