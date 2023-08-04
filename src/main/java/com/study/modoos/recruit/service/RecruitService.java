@@ -5,7 +5,7 @@ import com.study.modoos.common.exception.ModoosException;
 import com.study.modoos.common.service.EntityFinder;
 import com.study.modoos.member.entity.Member;
 import com.study.modoos.participant.entity.Participant;
-import com.study.modoos.participant.repository.ParticipantRepostiory;
+import com.study.modoos.participant.repository.ParticipantRepository;
 import com.study.modoos.recruit.request.ChangeRecruitRequest;
 import com.study.modoos.recruit.request.RecruitRequest;
 import com.study.modoos.recruit.response.RecruitIdResponse;
@@ -30,7 +30,7 @@ public class RecruitService {
     private final StudyRepository studyRepository;
     private final StudyRepositoryImpl studyRepositoryImpl;
     private final EntityFinder entityFinder;
-    private final ParticipantRepostiory participantRepostiory;
+    private final ParticipantRepository participantRepostiory;
 
     @Transactional
     public RecruitIdResponse postRecruit(Member currentMember, RecruitRequest request) {
