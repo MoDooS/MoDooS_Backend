@@ -1,18 +1,22 @@
-//package com.study.modoos.participant.response;
-//
-//import com.study.modoos.member.entity.Member;
-//import com.study.modoos.study.entity.Study;
-//import lombok.*;
-//
-//@Getter
-//@NoArgsConstructor(access = AccessLevel.PROTECTED)
-//public class StandbyResponse {
-//    private Long id;
-//    private Member member;
-//    private Study study;
-//
-//    public StandbyResponse(Member member, Study study) {
-//        this.member = member;
-//        this.study = study;
-//    }
-//}
+package com.study.modoos.participant.response;
+
+import com.study.modoos.participant.entity.Standby;
+import lombok.*;
+
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class StandbyResponse {
+    private Long standbyId;
+    private Long memberId;
+    private Long studyId;
+
+    public static StandbyResponse of(Standby standby) {
+        return StandbyResponse.builder()
+                .standbyId(standby.getId())
+                .memberId(standby.getMember().getId())
+                .studyId(standby.getStudy().getId())
+                .build();
+    }
+}

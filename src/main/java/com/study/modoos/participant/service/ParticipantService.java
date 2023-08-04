@@ -8,6 +8,7 @@ import com.study.modoos.participant.entity.Participant;
 import com.study.modoos.participant.entity.Standby;
 import com.study.modoos.participant.repository.ParticipantRepostiory;
 import com.study.modoos.participant.repository.StandbyRepository;
+import com.study.modoos.participant.response.StandbyResponse;
 import com.study.modoos.study.entity.Study;
 import com.study.modoos.study.repository.StudyRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class ParticipantService {
     private final MemberRepository memberRepository;
     private final StudyRepository studyRepository;
 
-    public void applyStudy(Member member, Long studyId) {
+    public StandbyResponse applyStudy(Member member, Long studyId) {
         Member currentUser = memberRepository.findById(member.getId())
                 .orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_FOUND));
         Study study = studyRepository.findById(studyId)
@@ -39,6 +40,8 @@ public class ParticipantService {
         }
         Standby standby = new Standby(currentUser, study);
         standbyRepository.save(standby);
+        Standby standby_waiter = standbyRepository.findByMemberAndStudy(currentUser, study);
+        return StandbyResponse.of(standby_waiter);
     }
 
     public void acceptApplication(Member member, Long standbyId) {

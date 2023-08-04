@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StandbyRepository extends JpaRepository<Standby, Long> {
     boolean existsByStudyAndMember(Study study, Member currentUser);
+
+    Standby findByMemberAndStudy(Member currentUser, Study study);
 }
