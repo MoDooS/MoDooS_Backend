@@ -8,7 +8,7 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.study.modoos.member.entity.Member;
-import com.study.modoos.recruit.response.RecruitInfoResponse;
+import com.study.modoos.recruit.response.RecruitListInfoResponse;
 import com.study.modoos.study.entity.Category;
 import com.study.modoos.study.entity.Study;
 import jakarta.annotation.Nullable;
@@ -31,10 +31,10 @@ public class StudyRepositoryImpl {
 
     private final JPAQueryFactory queryFactory;
 
-    public Slice<RecruitInfoResponse> getSliceOfRecruit(Member member,
-                                                        final String title,
-                                                        final List<Category> categoryList,
-                                                        Pageable pageable) {
+    public Slice<RecruitListInfoResponse> getSliceOfRecruit(Member member,
+                                                            final String title,
+                                                            final List<Category> categoryList,
+                                                            Pageable pageable) {
         /*
         if (order.equals("likeCount")) {
             content = queryFactory
@@ -59,9 +59,9 @@ public class StudyRepositoryImpl {
                     Order.DESC, pathBuilder.get(o.getProperty())));
         }
 
-        List<RecruitInfoResponse> contents = results.fetch()
+        List<RecruitListInfoResponse> contents = results.fetch()
                 .stream()
-                .map(o -> RecruitInfoResponse.of(o, o.isWrittenPost(member)))
+                .map(o -> RecruitListInfoResponse.of(o))
                 .collect(Collectors.toList());
 
 
