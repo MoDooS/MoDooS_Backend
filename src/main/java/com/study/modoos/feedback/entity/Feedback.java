@@ -2,7 +2,7 @@ package com.study.modoos.feedback.entity;
 
 
 import com.study.modoos.common.entity.BaseTimeEntity;
-import com.study.modoos.study.entity.Participant;
+import com.study.modoos.participant.entity.Participant;
 import com.study.modoos.study.entity.Study;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
