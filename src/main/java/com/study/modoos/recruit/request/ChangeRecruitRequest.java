@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -26,4 +27,5 @@ public class ChangeRecruitRequest {
     String rule_content;
     String title;
     String description;
+    List<TodoRequest> checkList;
 }

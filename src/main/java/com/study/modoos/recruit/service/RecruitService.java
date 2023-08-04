@@ -7,12 +7,17 @@ import com.study.modoos.member.entity.Member;
 import com.study.modoos.member.repository.MemberRepository;
 import com.study.modoos.recruit.request.ChangeRecruitRequest;
 import com.study.modoos.recruit.request.RecruitRequest;
+import com.study.modoos.recruit.request.TodoRequest;
 import com.study.modoos.recruit.response.RecruitIdResponse;
 import com.study.modoos.recruit.response.RecruitInfoResponse;
+import com.study.modoos.recruit.response.RecruitListInfoResponse;
+import com.study.modoos.recruit.response.TodoResponse;
 import com.study.modoos.study.entity.Category;
 import com.study.modoos.study.entity.Study;
+import com.study.modoos.study.entity.Todo;
 import com.study.modoos.study.repository.StudyRepository;
 import com.study.modoos.study.repository.StudyRepositoryImpl;
+import com.study.modoos.study.repository.TodoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -21,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -30,10 +36,23 @@ public class RecruitService {
     private final StudyRepository studyRepository;
     private final StudyRepositoryImpl studyRepositoryImpl;
     private final EntityFinder entityFinder;
+    private final TodoRepository todoRepository;
 
     @Transactional
     public RecruitIdResponse postRecruit(Member currentMember, RecruitRequest request) {
+        List<String> todos = request.getCheckList();
+
         Study study = request.createRecruit(currentMember);
+        studyRepository.save(study);
+
+        for (String todo : todos) {
+            Todo t = Todo.builder().
+                    study(study)
+                    .content(todo)
+                    .build();
+            todoRepository.save(t);
+        }
+
         studyRepository.save(study);
         return RecruitIdResponse.of(study);
     }
@@ -42,13 +61,17 @@ public class RecruitService {
         Study study = studyRepository.findById(id)
                 .orElseThrow(() -> new ModoosException(ErrorCode.STUDY_NOT_FOUND));
 
+        List<TodoResponse> checkList = todoRepository.findTodoByStudy(study)
+                .stream().map(o -> TodoResponse.of(o))
+                .collect(Collectors.toList());
+
         if (study.getLeader().getId().equals(currentMember.getId())) {
-            return RecruitInfoResponse.of(study, true);
+            return RecruitInfoResponse.of(study, true, checkList);
         }
-        return RecruitInfoResponse.of(study, false);
+        return RecruitInfoResponse.of(study, false, checkList);
     }
 
-    public Slice<RecruitInfoResponse> getRecruitList(Member member, String search, List<String> categoryList, Pageable pageable) {
+    public Slice<RecruitListInfoResponse> getRecruitList(Member member, String search, List<String> categoryList, Pageable pageable) {
 
         List<Category> categories = new ArrayList<>();
 
@@ -71,11 +94,36 @@ public class RecruitService {
             throw new ModoosException(ErrorCode.STUDY_NOT_EDIT);
         }
 
+        //스터디 모집공고 내용 update
         study.update(request.getCampus(), request.getChannel(), request.getCategory(),
                 request.getExpected_start_at(), request.getExpected_end_at(), request.getContact(),
                 request.getRule_content(), request.getTitle(), request.getDescription(),
                 request.getAbsent(), request.getLate(), request.getOut(), request.getRule_content());
 
+        //체크리스트 확인해서 update
+        List<TodoRequest> checkList = request.getCheckList();
+        Todo todo;
+
+        for (TodoRequest todoRequest : checkList) {
+            if (todoRequest.getRequestType().equals("없음"))
+                continue;
+
+            if (todoRequest.getRequestType().equals("추가")) {
+                todo = todoRequest.createTodo(study);
+                todoRepository.save(todo);
+            } else if (todoRequest.getRequestType().equals("수정")) {
+                todo = todoRepository.findById(todoRequest.getId())
+                        .orElseThrow(() -> new ModoosException(ErrorCode.TODO_NOT_FOUND));
+                todo.setContent(todoRequest.getContent());
+                todoRepository.save(todo);
+            } else if (todoRequest.getRequestType().equals("삭제")) {
+                todo = todoRepository.findById(todoRequest.getId())
+                        .orElseThrow(() -> new ModoosException(ErrorCode.TODO_NOT_FOUND));
+                todoRepository.delete(todo);
+            } else {
+                throw new ModoosException(ErrorCode.VALUE_NOT_IN_OPTION);
+            }
+        }
 
         studyRepository.save(study);
         return RecruitIdResponse.of(study);
@@ -93,6 +141,10 @@ public class RecruitService {
         //스터디가 이미 생성된 모집공고면 삭제 불가능
         if (study.getStatus() == 2) {
             throw new ModoosException(ErrorCode.STUDY_NOT_EDIT);
+        }
+
+        for (Todo todo : todoRepository.findTodoByStudy(study)) {
+            todoRepository.delete(todo);
         }
         studyRepository.delete(study);
     }
