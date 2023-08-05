@@ -41,8 +41,8 @@ public class Feedback extends BaseTimeEntity {
     private int attend; //출석여부
 
     @ColumnDefault("0")
-    @Column(name = "deligence")
-    private int deligence;  //규칙이행도
+    @Column(name = "diligence")
+    private int diligence;  //규칙이행도
 
     @ColumnDefault("0")
     @Column(name = "participate")
@@ -56,13 +56,13 @@ public class Feedback extends BaseTimeEntity {
 
     @Builder
     public Feedback(Study study, Participant receiver, Participant sender, int times,
-                    int attend, int deligence, int participate, Positive positive, Negative negative) {
+                    int attend, int diligence, int participate, Positive positive, Negative negative) {
         this.study = study;
         this.receiver = receiver;
         this.sender = sender;
         this.times = times;
         this.attend = attend;
-        this.deligence = deligence;
+        this.diligence = diligence;
         this.participate = participate;
         this.positive = positive;
         this.negative = negative;
