@@ -47,8 +47,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
     public String resolveToken(HttpServletRequest httpServletRequest) {
         Cookie[] cookies = httpServletRequest.getCookies();
+        System.out.println("cookie resolveToken");
         if (cookies != null) {
             for (Cookie cookie : cookies) {
+                System.out.println("cookie resolveToken ::::::: "+ cookie.getName());
                 if ("accessToken".equals(cookie.getName())) {
                     return cookie.getValue();
                 }
