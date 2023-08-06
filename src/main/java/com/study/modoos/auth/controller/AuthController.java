@@ -35,7 +35,7 @@ public class AuthController {
 
         ResponseCookie accessTokenCookie = ResponseCookie.from("access-token", loginResponse.getAccessToken())
                 .path("/")
-                .domain(".localhost")
+                .domain("127.0.0.1")
                 .sameSite("None")
                 .httpOnly(false)
                 .secure(true)
