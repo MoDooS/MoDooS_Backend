@@ -1,5 +1,7 @@
 package com.study.modoos.auth.jwt;
 
+import com.study.modoos.common.exception.ErrorCode;
+import com.study.modoos.common.exception.ModoosException;
 import io.jsonwebtoken.IncorrectClaimException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -14,7 +16,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -48,17 +49,15 @@ public class JwtFilter extends OncePerRequestFilter {
 
     public String resolveToken(HttpServletRequest httpServletRequest) {
         Cookie[] cookies = httpServletRequest.getCookies();
-        System.out.println("cookie resolveToken");
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                System.out.println("cookie resolveToken ::::::: "+ cookie.getName());
-                if ("accessToken".equals(cookie.getName())) {
+                if ("access-token".equals(cookie.getName())) {
                     return cookie.getValue();
+                }else{
+                    throw new ModoosException(ErrorCode.INVALID_COOKIE_NAME);
                 }
             }
         }
-        System.out.println(Arrays.toString(httpServletRequest.getCookies()) + "\n::::::::::::::::::::::::;;;");
-
         return null;
     }
 }
