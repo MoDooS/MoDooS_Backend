@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -56,6 +57,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
         }
+        System.out.println(Arrays.toString(httpServletRequest.getCookies()) + "\n::::::::::::::::::::::::;;;");
+
         return null;
     }
 }
