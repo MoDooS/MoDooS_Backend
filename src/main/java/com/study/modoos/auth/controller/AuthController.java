@@ -35,6 +35,7 @@ public class AuthController {
 
         ResponseCookie accessTokenCookie = ResponseCookie.from("access-token", loginResponse.getAccessToken())
                 .path("/")
+                .domain("modustudy.com")
                 .sameSite("None")
                 .httpOnly(false)
                 .secure(true)
@@ -46,6 +47,7 @@ public class AuthController {
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh-token", loginResponse.getRefreshToken())
                 .path("/")
+                .domain("modustudy.com")
                 .sameSite("None")
                 .httpOnly(false)
                 .secure(true)
