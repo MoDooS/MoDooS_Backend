@@ -37,7 +37,7 @@ public class AuthController {
         // Refresh Token을 HttpOnly 쿠키에 저장하여 전달
         Cookie refreshTokenCookie = new Cookie("refresh-token", loginResponse.getRefreshToken());
         refreshTokenCookie.setMaxAge(COOKIE_EXPIRATION);
-        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setHttpOnly(false);
         refreshTokenCookie.setSecure(true);
         refreshTokenCookie.setPath("/");
         response.addCookie(refreshTokenCookie);
@@ -45,7 +45,7 @@ public class AuthController {
         // Access Token을 HttpOnly 쿠키에 담아서 전송
         Cookie accessTokenCookie = new Cookie("access-token", loginResponse.getAccessToken());
         accessTokenCookie.setMaxAge(COOKIE_EXPIRATION);
-        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setHttpOnly(false);
         accessTokenCookie.setSecure(true);
         accessTokenCookie.setPath("/");
         response.addCookie(accessTokenCookie);
