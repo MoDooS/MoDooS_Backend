@@ -51,12 +51,14 @@ public class JwtFilter extends OncePerRequestFilter {
         Cookie[] cookies = httpServletRequest.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("access-token".equals(cookie.getName())) {
+                if ("accessToken".equals(cookie.getName())) {
                     return cookie.getValue();
                 }else{
                     throw new ModoosException(ErrorCode.INVALID_COOKIE_NAME);
                 }
             }
+        }else{
+            throw new ModoosException(ErrorCode.INVALID_TOKEN);
         }
         return null;
     }
