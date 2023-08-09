@@ -13,10 +13,8 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("https://modustudy.com");
-        config.addAllowedOriginPattern("http://localhost:3000");
+        config.addAllowedOriginPattern("*");
         config.addAllowedHeader("*");
-        config.addExposedHeader("Set-Cookie");
         config.addAllowedMethod("POST, GET, PUT, OPTIONS, DELETE, HEAD");
 
         source.registerCorsConfiguration("/**", config);
