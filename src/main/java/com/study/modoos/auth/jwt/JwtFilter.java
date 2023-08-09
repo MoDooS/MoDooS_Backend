@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -29,6 +30,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String accessToken = resolveToken(request);
 
         try { // 정상 토큰인지 검사
+            System.out.println("doFilterInternal validation test");
             if (accessToken != null && jwtProvider.validateAccessToken(accessToken)) {
                 Authentication authentication = jwtProvider.getAuthentication(accessToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -49,7 +51,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     public String resolveToken(HttpServletRequest httpServletRequest) {
         Cookie[] cookies = httpServletRequest.getCookies();
-        if (cookies != null) {
+        if (cookies != null && cookies.length > 0) {
             for (Cookie cookie : cookies) {
                 if ("accessToken".equals(cookie.getName())) {
                     return cookie.getValue();
@@ -58,6 +60,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
         }else{
+            System.out.println(Arrays.toString(cookies));
             throw new ModoosException(ErrorCode.INVALID_TOKEN);
         }
         return null;
