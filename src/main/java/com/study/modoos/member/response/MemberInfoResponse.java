@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class MemberInfoResponse {
+    private Long memberId;
 
     private String nickname;
 
@@ -28,6 +29,7 @@ public class MemberInfoResponse {
 
     public static MemberInfoResponse of(Member member) {
         return MemberInfoResponse.builder()
+                .memberId(member.getId())
                 .nickname(member.getNickname())
                 .email(member.getEmail())
                 .campus(member.getCampus())
