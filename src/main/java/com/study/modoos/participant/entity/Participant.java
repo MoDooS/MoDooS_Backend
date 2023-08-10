@@ -1,5 +1,6 @@
 package com.study.modoos.participant.entity;
 
+import com.study.modoos.common.entity.BaseTimeEntity;
 import com.study.modoos.member.entity.Member;
 import com.study.modoos.study.entity.Study;
 import jakarta.persistence.*;
@@ -12,7 +13,7 @@ import java.util.Objects;
 @Table(name = "participant")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = {"member", "study"})
-public class Participant {
+public class Participant extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
