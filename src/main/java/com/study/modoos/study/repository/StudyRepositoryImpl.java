@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.study.modoos.study.entity.QStudy.study;
+import static com.study.modoos.participant.entity.QParticipant.participant;
 
 @Repository
 @RequiredArgsConstructor
@@ -104,5 +105,35 @@ public class StudyRepositoryImpl {
         }
 
         return booleanBuilder;
+    }
+
+    public Slice<RecruitListInfoResponse> getMyStudyList(Member member, Pageable pageable) {
+        JPAQuery<Study> results = queryFactory.selectFrom(study)
+                .from(participant)
+                .where(participant.member.eq(member))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1);
+
+        for (Sort.Order o : pageable.getSort()) {
+            PathBuilder pathBuilder = new PathBuilder(study.getType(), study.getMetadata());
+            results.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC :
+                    Order.DESC, pathBuilder.get(o.getProperty())));
+        }
+
+        List<RecruitListInfoResponse> contents = results.fetch()
+                .stream()
+                .map(RecruitListInfoResponse::of)
+                .collect(Collectors.toList());
+
+
+        boolean hasNext = false;
+
+
+        if (contents.size() > pageable.getPageSize()) {
+            contents.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+
+        return new SliceImpl<>(contents, pageable, hasNext);
     }
 }
