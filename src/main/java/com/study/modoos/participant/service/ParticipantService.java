@@ -47,7 +47,7 @@ public class ParticipantService {
         if (isParticipant) {
             throw new ModoosException(ErrorCode.ALREADY_PARTICIPANT);
         }
-        if(isStandby){
+        if (isStandby) {
             throw new ModoosException(ErrorCode.ALREADY_STANDBY);
         }
         Standby standby = new Standby(currentUser, study);
@@ -59,19 +59,21 @@ public class ParticipantService {
     public ParticipantResponse acceptApplication(Member member, Long standbyId) {
         Member currentUser = memberRepository.findById(member.getId())
                 .orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_FOUND));
-        Standby standby = standbyRepository.findWithMemberAndStudyById(standbyId)
+        Standby standby = standbyRepository.findWithMemberAndStandbyId(standbyId)
                 .orElseThrow(() -> new ModoosException(ErrorCode.WAITER_NOT_FOUND));
 
         Study study = standby.getStudy();
-        Member applicant  = standby.getMember();
+        Member applicant = standby.getMember();
 
-        if (!study.getLeader().equals(currentUser)){
+        if (!study.getLeader().equals(currentUser)) {
             throw new ModoosException(ErrorCode.FORBIDDEN_STUDY_ACCEPT);
         }
 
         Participant participant = new Participant(applicant, study);
         participantRepository.save(participant);
-        Participant participant_confirm = participantRepository.findByMemberAndStudy(applicant, study);
+        Participant participant_confirm = participantRepository.findByMemberAndStudy(applicant, study)
+                .orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_IN_STUDY));
+
         standbyRepository.delete(standby);
 
         return ParticipantResponse.of(participant_confirm);
@@ -80,11 +82,11 @@ public class ParticipantService {
     public void rejectApplication(Member member, Long standbyId) {
         Member currentUser = memberRepository.findById(member.getId())
                 .orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_FOUND));
-        Standby standby = standbyRepository.findWithMemberAndStudyById(standbyId)
+        Standby standby = standbyRepository.findWithMemberAndStandbyId(standbyId)
                 .orElseThrow(() -> new ModoosException(ErrorCode.WAITER_NOT_FOUND));
 
         Study study = standby.getStudy();
-        if (!study.getLeader().equals(currentUser)){
+        if (!study.getLeader().equals(currentUser)) {
             throw new ModoosException(ErrorCode.FORBIDDEN_STUDY_ACCEPT);
         }
 

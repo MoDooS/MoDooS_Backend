@@ -36,6 +36,7 @@ public class StudyRepositoryImpl {
     public Slice<RecruitListInfoResponse> getSliceOfRecruit(Member member,
                                                             final String title,
                                                             final List<Category> categoryList,
+                                                            Long lastId,
                                                             Pageable pageable) {
         /*
         if (order.equals("likeCount")) {
@@ -50,7 +51,8 @@ public class StudyRepositoryImpl {
         JPAQuery<Study> results = queryFactory.selectFrom(study)
                 .where(
                         titleLike(title),
-                        categoryEq(categoryList))
+                        categoryEq(categoryList),
+                        study.id.gt(lastId))
                 //.orderBy(study.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1);

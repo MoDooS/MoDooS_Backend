@@ -5,6 +5,7 @@ import com.study.modoos.participant.entity.Standby;
 import com.study.modoos.study.entity.Study;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -14,6 +15,6 @@ public interface StandbyRepository extends JpaRepository<Standby, Long> {
     Standby findByMemberAndStudy(Member currentUser, Study study);
 
     @Query("SELECT s FROM Standby s JOIN FETCH s.member m JOIN FETCH s.study st WHERE s.id = :standbyId")
-    Optional<Standby> findWithMemberAndStudyById(Long standbyId);
+    Optional<Standby> findWithMemberAndStandbyId(@Param("standbyId") Long standbyId);
 }
 
