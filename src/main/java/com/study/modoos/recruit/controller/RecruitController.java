@@ -31,7 +31,7 @@ public class RecruitController {
         return ResponseEntity.ok(recruitService.postRecruit(member, recruitRequest));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/postInfo/{id}")
     public ResponseEntity<RecruitInfoResponse> getRecruit(@CurrentUser Member member, @PathVariable(value = "id") Long id) {
         return ResponseEntity.ok(recruitService.oneRecruit(member, id));
     }

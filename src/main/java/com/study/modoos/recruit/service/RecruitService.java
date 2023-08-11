@@ -74,7 +74,7 @@ public class RecruitService {
                 .stream().map(o -> TodoResponse.of(o))
                 .collect(Collectors.toList());
 
-        if (study.getLeader().getId().equals(currentMember.getId())) {
+        if ( currentMember != null && study.getLeader().getId().equals(currentMember.getId())) {
             return RecruitInfoResponse.of(study, true, checkList);
         }
         return RecruitInfoResponse.of(study, false, checkList);

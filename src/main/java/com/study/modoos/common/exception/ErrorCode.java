@@ -31,7 +31,8 @@ public enum ErrorCode {
     NOT_EVALUATION_PERIOD(HttpStatus.FORBIDDEN, "평기 기간이 아닙니다.", "평가기간을 다시 한 번 확인해주세요."),
     MEMBER_IS_ABSENT(HttpStatus.FORBIDDEN, "결석한 참여자는 평가할 수 없습니다.", "이번 회차 출결을 확인해주세요."),
     UNABLE_TO_START_ON_THE_DAY(HttpStatus.FORBIDDEN, "스터디 시작일은 당잉이 될 수 없습니다.", "스터디 시작일을 변경해주세요."),
-    ALREADY_FEEDBACK(HttpStatus.CONFLICT, "이미 평가하였습니다.", "평가 주차와 이전 평가 여부를 다시 한 번 확인해주세요.");
+    ALREADY_FEEDBACK(HttpStatus.CONFLICT, "이미 평가하였습니다.", "평가 주차와 이전 평가 여부를 다시 한 번 확인해주세요."),
+    INVALID_COOKIE_NAME(HttpStatus.NOT_FOUND, "JwtFilter > resolveToken 에서 쿠키 이름이 다릅니다", "cookie.getName()으로 쿠키 이름을 확인해주세요");
 
     private final HttpStatus httpStatus;
     private final String message;
