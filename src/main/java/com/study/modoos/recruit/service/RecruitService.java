@@ -19,6 +19,7 @@ import com.study.modoos.study.entity.Todo;
 import com.study.modoos.study.repository.StudyRepository;
 import com.study.modoos.study.repository.StudyRepositoryImpl;
 import com.study.modoos.study.repository.TodoRepository;
+import com.study.modoos.study.response.StudyParticipantResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -74,10 +75,17 @@ public class RecruitService {
                 .stream().map(o -> TodoResponse.of(o))
                 .collect(Collectors.toList());
 
-        if ( currentMember != null && study.getLeader().getId().equals(currentMember.getId())) {
-            return RecruitInfoResponse.of(study, true, checkList);
+        List<Participant> participantList = participantRepostiory.findByStudy(study);
+        List<StudyParticipantResponse> participantResponseList = new ArrayList<>();
+
+        for (Participant participant : participantList) {
+            participantResponseList.add(StudyParticipantResponse.of(participant, null));
         }
-        return RecruitInfoResponse.of(study, false, checkList);
+
+        if (currentMember != null && study.getLeader().getId().equals(currentMember.getId())) {
+            return RecruitInfoResponse.of(study, true, checkList, participantResponseList);
+        }
+        return RecruitInfoResponse.of(study, false, checkList, participantResponseList);
     }
 
     public Slice<RecruitListInfoResponse> getRecruitList(Member member, String search, List<String> categoryList, Long lastId, Pageable pageable) {
@@ -161,6 +169,7 @@ public class RecruitService {
     public Long findMaxRecruitIdx() {
         return studyRepositoryImpl.findMaxRecruitIdx().getId();
     }
+
     @Transactional
     public Slice<RecruitListInfoResponse> getMyStudyList(Member member, Pageable pageable) {
         return studyRepositoryImpl.getMyStudyList(member, pageable);
