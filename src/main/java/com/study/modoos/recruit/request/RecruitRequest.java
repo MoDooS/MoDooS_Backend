@@ -28,7 +28,6 @@ public class RecruitRequest {
     int late;
     int absent;
     int out;
-    String rule_content;
     String title;
     String description;
     List<String> checkList;
@@ -49,7 +48,6 @@ public class RecruitRequest {
                 .late(late)
                 .absent(absent)
                 .out(out)
-                .rule_content(rule_content)
                 .title(title)
                 .description(description)
                 .build();
