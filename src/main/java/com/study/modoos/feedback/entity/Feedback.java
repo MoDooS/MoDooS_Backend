@@ -36,17 +36,11 @@ public class Feedback extends BaseTimeEntity {
     @Column(name = "times")
     private int times;  //회차번호
 
-    @ColumnDefault("0")
-    @Column(name = "attend")
-    private int attend; //출석여부
-
-    @ColumnDefault("0")
-    @Column(name = "deligence")
-    private int deligence;  //규칙이행도
-
-    @ColumnDefault("0")
+    @ColumnDefault("1")
     @Column(name = "participate")
     private int participate;  //참여도
+
+    private boolean isReflected;    //해당 피드백이 점수에 반영되었는지 여부
 
     @Enumerated(EnumType.STRING)
     private Positive positive;
@@ -56,15 +50,14 @@ public class Feedback extends BaseTimeEntity {
 
     @Builder
     public Feedback(Study study, Participant receiver, Participant sender, int times,
-                    int attend, int deligence, int participate, Positive positive, Negative negative) {
+                    int participate, Positive positive, Negative negative) {
         this.study = study;
         this.receiver = receiver;
         this.sender = sender;
         this.times = times;
-        this.attend = attend;
-        this.deligence = deligence;
         this.participate = participate;
         this.positive = positive;
         this.negative = negative;
+        this.isReflected = false;
     }
 }
