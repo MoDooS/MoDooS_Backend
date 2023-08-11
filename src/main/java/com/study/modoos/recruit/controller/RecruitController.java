@@ -56,4 +56,10 @@ public class RecruitController {
         recruitService.deleteRecruit(member, id);
         return ResponseEntity.ok(NormalResponse.success());
     }
+
+    @GetMapping("/my")
+    public ResponseEntity<Slice<RecruitListInfoResponse>> getMyStudyList(@CurrentUser Member member,
+                                                                     @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable) {
+        return ResponseEntity.ok(recruitService.getMyStudyList(member, pageable));
+    }
 }
