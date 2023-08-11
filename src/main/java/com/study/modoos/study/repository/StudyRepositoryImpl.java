@@ -8,6 +8,7 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.study.modoos.member.entity.Member;
+import com.study.modoos.participant.entity.Participant;
 import com.study.modoos.recruit.response.RecruitListInfoResponse;
 import com.study.modoos.study.entity.Category;
 import com.study.modoos.study.entity.Study;
@@ -108,8 +109,8 @@ public class StudyRepositoryImpl {
     }
 
     public Slice<RecruitListInfoResponse> getMyStudyList(Member member, Pageable pageable) {
-        JPAQuery<Study> results = queryFactory.selectFrom(study)
-                .from(participant)
+        JPAQuery<Participant> results = queryFactory.selectFrom(participant)
+                .join(participant.study,study)
                 .where(participant.member.eq(member))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1);
@@ -122,7 +123,7 @@ public class StudyRepositoryImpl {
 
         List<RecruitListInfoResponse> contents = results.fetch()
                 .stream()
-                .map(RecruitListInfoResponse::of)
+                .map(o -> RecruitListInfoResponse.of(o.getStudy()))
                 .collect(Collectors.toList());
 
 
