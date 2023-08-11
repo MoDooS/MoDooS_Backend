@@ -4,6 +4,7 @@ import com.study.modoos.member.entity.Campus;
 import com.study.modoos.study.entity.Category;
 import com.study.modoos.study.entity.Channel;
 import com.study.modoos.study.entity.Study;
+import com.study.modoos.study.response.StudyParticipantResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -55,7 +56,10 @@ public class RecruitInfoResponse {
 
     private List<TodoResponse> checkList;
 
-    public static RecruitInfoResponse of(Study study, boolean isWritten, List<TodoResponse> checkList) {
+    private List<StudyParticipantResponse> participantList;
+
+    public static RecruitInfoResponse of(Study study, boolean isWritten, List<TodoResponse> checkList,
+                                         List<StudyParticipantResponse> participantList) {
         return RecruitInfoResponse.builder()
                 .id(study.getId())
                 .leader_id(study.getLeader().getId())
@@ -76,6 +80,7 @@ public class RecruitInfoResponse {
                 .contact(study.getContact())
                 .isWritten(isWritten)
                 .checkList(checkList)
+                .participantList(participantList)
                 .build();
     }
 }
