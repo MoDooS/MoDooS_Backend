@@ -35,7 +35,7 @@ public class Feedback extends BaseTimeEntity {
     @ColumnDefault("0")
     @Column(name = "times")
     private int times;  //회차번호
-
+    
     @ColumnDefault("1")
     @Column(name = "participate")
     private int participate;  //참여도
@@ -51,6 +51,7 @@ public class Feedback extends BaseTimeEntity {
     @Builder
     public Feedback(Study study, Participant receiver, Participant sender, int times,
                     int participate, Positive positive, Negative negative) {
+
         this.study = study;
         this.receiver = receiver;
         this.sender = sender;

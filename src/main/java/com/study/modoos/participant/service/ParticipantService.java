@@ -8,11 +8,15 @@ import com.study.modoos.participant.entity.Participant;
 import com.study.modoos.participant.entity.Standby;
 import com.study.modoos.participant.repository.ParticipantRepository;
 import com.study.modoos.participant.repository.StandbyRepository;
+import com.study.modoos.participant.repository.StandbyRepositoryImpl;
+import com.study.modoos.participant.response.AllApplicationResponse;
 import com.study.modoos.participant.response.ParticipantResponse;
 import com.study.modoos.participant.response.StandbyResponse;
 import com.study.modoos.study.entity.Study;
 import com.study.modoos.study.repository.StudyRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +29,11 @@ public class ParticipantService {
     private final StandbyRepository standbyRepository;
     private final MemberRepository memberRepository;
     private final StudyRepository studyRepository;
+    private final StandbyRepositoryImpl standbyRepositoryImpl;
+
+    public Slice<AllApplicationResponse> getAllApply(Member member, Pageable page) {
+        return standbyRepositoryImpl.getSliceOfAllApplication(member, page);
+    }
 
     public StandbyResponse applyStudy(Member member, Long studyId) {
         Member currentUser = memberRepository.findById(member.getId())

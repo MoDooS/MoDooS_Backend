@@ -1,8 +1,11 @@
-package com.study.modoos.study.entity;
+package com.study.modoos.heart.entity;
 
+import com.study.modoos.common.entity.BaseTimeEntity;
 import com.study.modoos.member.entity.Member;
+import com.study.modoos.study.entity.Study;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "heart")
-public class Heart {
+public class Heart extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,4 +25,10 @@ public class Heart {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "study_id", referencedColumnName = "id")
     private Study study;
+
+    @Builder
+    public Heart(Member member, Study study) {
+        this.member = member;
+        this.study =study;
+    }
 }

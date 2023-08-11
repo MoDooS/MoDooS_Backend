@@ -16,7 +16,7 @@ import java.util.Objects;
 @Table(name = "participant")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = {"member", "study"})
-public class Participant {
+public class Participant{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
