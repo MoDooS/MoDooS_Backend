@@ -24,7 +24,6 @@ public class ChangeRecruitRequest {
     int late;
     int absent;
     int out;
-    String rule_content;
     String title;
     String description;
     List<TodoRequest> checkList;

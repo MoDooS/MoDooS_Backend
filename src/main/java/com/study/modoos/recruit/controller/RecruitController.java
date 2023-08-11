@@ -40,9 +40,10 @@ public class RecruitController {
     public ResponseEntity<Slice<RecruitListInfoResponse>> getRecruitList(@CurrentUser Member member,
                                                                          @RequestParam(value = "category", defaultValue = "") List<String> category,
                                                                          @RequestParam(value = "searchBy", required = false) String search,
+                                                                         @RequestParam(value = "lastId", required = false) Long lastId,
                                                                          @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable) {
 
-        return ResponseEntity.ok(recruitService.getRecruitList(member, search, category, pageable));
+        return ResponseEntity.ok(recruitService.getRecruitList(member, search, category, lastId, pageable));
 
     }
 

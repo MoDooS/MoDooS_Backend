@@ -55,8 +55,12 @@ public class RecruitService {
         }
 
         studyRepository.save(study);
-      
-        Participant participant = new Participant(currentMember, study);
+
+        Participant participant = Participant.builder()
+                .member(currentMember)
+                .study(study)
+                .build();
+
         participantRepostiory.save(participant);
 
         return RecruitIdResponse.of(study);
@@ -76,14 +80,14 @@ public class RecruitService {
         return RecruitInfoResponse.of(study, false, checkList);
     }
 
-    public Slice<RecruitListInfoResponse> getRecruitList(Member member, String search, List<String> categoryList, Pageable pageable) {
+    public Slice<RecruitListInfoResponse> getRecruitList(Member member, String search, List<String> categoryList, Long lastId, Pageable pageable) {
 
         List<Category> categories = new ArrayList<>();
 
         for (String s : categoryList) {
             categories.add(Category.resolve(s));
         }
-        return studyRepositoryImpl.getSliceOfRecruit(member, search, categories, pageable);
+        return studyRepositoryImpl.getSliceOfRecruit(member, search, categories, lastId, pageable);
     }
 
     @Transactional
@@ -102,8 +106,8 @@ public class RecruitService {
         //스터디 모집공고 내용 update
         study.update(request.getCampus(), request.getChannel(), request.getCategory(),
                 request.getExpected_start_at(), request.getExpected_end_at(), request.getContact(),
-                request.getRule_content(), request.getTitle(), request.getDescription(),
-                request.getAbsent(), request.getLate(), request.getOut(), request.getRule_content());
+                request.getLink(), request.getTitle(), request.getDescription(),
+                request.getAbsent(), request.getLate(), request.getOut());
 
         //체크리스트 확인해서 update
         List<TodoRequest> checkList = request.getCheckList();
