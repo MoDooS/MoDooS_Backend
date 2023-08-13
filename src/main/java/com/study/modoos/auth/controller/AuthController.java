@@ -37,19 +37,18 @@ public class AuthController {
                 .path("/")
                 .domain("localhost")
                 .sameSite("None")
-                .httpOnly(true)
+                .httpOnly(false)
                 .secure(true)
                 .maxAge(COOKIE_EXPIRATION)
                 .build();
 
         response.addHeader("Set-Cookie", accessTokenCookie.toString());
 
-
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh-token", loginResponse.getRefreshToken())
                 .path("/")
                 .domain("localhost")
                 .sameSite("None")
-                .httpOnly(true)
+                .httpOnly(false)
                 .secure(true)
                 .maxAge(COOKIE_EXPIRATION)
                 .build();
@@ -81,7 +80,9 @@ public class AuthController {
             // RT 저장
             ResponseCookie responseCookie = ResponseCookie.from("refresh-token", reissuedTokenDto.getRefreshToken())
                     .maxAge(COOKIE_EXPIRATION)
-                    .httpOnly(true)
+                    .domain("localhost")
+                    .sameSite("None")
+                    .httpOnly(false)
                     .secure(true)
                     .build();
             return ResponseEntity
@@ -106,10 +107,11 @@ public class AuthController {
 
     // 로그아웃
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String requestAccessToken) {
+    public ResponseEntity<?> logout(@CookieValue("access-token") String requestAccessToken) {
         authService.logout(requestAccessToken);
         ResponseCookie responseCookie = ResponseCookie.from("refresh-token", "")
                 .maxAge(0)
+                .domain("localhost")
                 .path("/")
                 .build();
 
