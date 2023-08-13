@@ -33,16 +33,8 @@ public class AuthController {
         // User 등록 및 Refresh Token 저장
         LoginResponse loginResponse = authService.login(loginRequest);
 
-        ResponseCookie accessTokenCookie = ResponseCookie.from("access-token", loginResponse.getAccessToken())
-                .path("/")
-                .domain("localhost")
-                .sameSite("None")
-                .httpOnly(false)
-                .secure(true)
-                .maxAge(COOKIE_EXPIRATION)
-                .build();
-
-        response.addHeader("Set-Cookie", accessTokenCookie.toString());
+        // Access Token과 TokenType을 함께 헤더에 담아서 전송
+        response.setHeader(HttpHeaders.AUTHORIZATION, loginResponse.getTokenType() + " " + loginResponse.getAccessToken());
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh-token", loginResponse.getRefreshToken())
                 .path("/")
@@ -107,7 +99,7 @@ public class AuthController {
 
     // 로그아웃
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@CookieValue("access-token") String requestAccessToken) {
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String requestAccessToken) {
         authService.logout(requestAccessToken);
         ResponseCookie responseCookie = ResponseCookie.from("refresh-token", "")
                 .maxAge(0)
