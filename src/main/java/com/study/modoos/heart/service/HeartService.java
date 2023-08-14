@@ -12,9 +12,9 @@ import com.study.modoos.member.repository.MemberRepository;
 import com.study.modoos.study.entity.Study;
 import com.study.modoos.study.repository.StudyRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
-
 
 
 @Service
@@ -41,10 +41,13 @@ public class HeartService {
 
         if (existingHeart != null) {
             heartRepository.delete(existingHeart);
-        }else {
+            study.deleteHeart();
+        } else {
             Heart heart = new Heart(currentUser, study);
             heartRepository.save(heart);
+            study.addHeart();
         }
+        studyRepository.save(study);
         return HeartClickResponse.of(member, study, existingHeart == null);
     }
 }
