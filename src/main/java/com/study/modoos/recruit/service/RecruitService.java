@@ -19,6 +19,7 @@ import com.study.modoos.study.entity.Todo;
 import com.study.modoos.study.repository.StudyRepository;
 import com.study.modoos.study.repository.StudyRepositoryImpl;
 import com.study.modoos.study.repository.TodoRepository;
+import com.study.modoos.study.response.StudyParticipantResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -55,8 +56,12 @@ public class RecruitService {
         }
 
         studyRepository.save(study);
-      
-        Participant participant = new Participant(currentMember, study);
+
+        Participant participant = Participant.builder()
+                .member(currentMember)
+                .study(study)
+                .build();
+
         participantRepostiory.save(participant);
 
         return RecruitIdResponse.of(study);
@@ -70,20 +75,27 @@ public class RecruitService {
                 .stream().map(o -> TodoResponse.of(o))
                 .collect(Collectors.toList());
 
-        if (study.getLeader().getId().equals(currentMember.getId())) {
-            return RecruitInfoResponse.of(study, true, checkList);
+        List<Participant> participantList = participantRepostiory.findByStudy(study);
+        List<StudyParticipantResponse> participantResponseList = new ArrayList<>();
+
+        for (Participant participant : participantList) {
+            participantResponseList.add(StudyParticipantResponse.of(participant, null));
         }
-        return RecruitInfoResponse.of(study, false, checkList);
+
+        if (currentMember != null && study.getLeader().getId().equals(currentMember.getId())) {
+            return RecruitInfoResponse.of(study, true, checkList, participantResponseList);
+        }
+        return RecruitInfoResponse.of(study, false, checkList, participantResponseList);
     }
 
-    public Slice<RecruitListInfoResponse> getRecruitList(Member member, String search, List<String> categoryList, Pageable pageable) {
+    public Slice<RecruitListInfoResponse> getRecruitList(Member member, String search, List<String> categoryList, Long lastId, Pageable pageable) {
 
         List<Category> categories = new ArrayList<>();
 
         for (String s : categoryList) {
             categories.add(Category.resolve(s));
         }
-        return studyRepositoryImpl.getSliceOfRecruit(member, search, categories, pageable);
+        return studyRepositoryImpl.getSliceOfRecruit(member, search, categories, lastId, pageable);
     }
 
     @Transactional
@@ -102,8 +114,8 @@ public class RecruitService {
         //스터디 모집공고 내용 update
         study.update(request.getCampus(), request.getChannel(), request.getCategory(),
                 request.getExpected_start_at(), request.getExpected_end_at(), request.getContact(),
-                request.getRule_content(), request.getTitle(), request.getDescription(),
-                request.getAbsent(), request.getLate(), request.getOut(), request.getRule_content());
+                request.getLink(), request.getTitle(), request.getDescription(),
+                request.getAbsent(), request.getLate(), request.getOut());
 
         //체크리스트 확인해서 update
         List<TodoRequest> checkList = request.getCheckList();
@@ -157,6 +169,7 @@ public class RecruitService {
     public Long findMaxRecruitIdx() {
         return studyRepositoryImpl.findMaxRecruitIdx().getId();
     }
+
     @Transactional
     public Slice<RecruitListInfoResponse> getMyStudyList(Member member, String status,Pageable pageable) {
         return studyRepositoryImpl.getMyStudyList(member, status, pageable);

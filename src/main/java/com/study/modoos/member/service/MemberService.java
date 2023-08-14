@@ -17,6 +17,9 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     public MemberInfoResponse getMemberInfo(Member currentMember) {
+        if (currentMember == null){
+            throw new ModoosException(ErrorCode.INVALID_TOKEN);
+        }
         return memberRepository.findById(currentMember.getId())
                 .map(MemberInfoResponse::of)
                 .orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_FOUND));

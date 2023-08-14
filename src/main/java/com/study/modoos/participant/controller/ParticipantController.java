@@ -12,7 +12,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -32,18 +35,18 @@ public class ParticipantController {
     }
 
     @GetMapping("/apply/{studyId}")
-    public ResponseEntity<StandbyResponse> applyStudy (@CurrentUser Member member,
-                                                       @PathVariable(value = "studyId") Long studyId){
+    public ResponseEntity<StandbyResponse> applyStudy(@CurrentUser Member member,
+                                                      @PathVariable(value = "studyId") Long studyId) {
         return ResponseEntity.ok(participantService.applyStudy(member, studyId));
     }
 
     @GetMapping("/accept/{standbyId}")
-    public ResponseEntity<ParticipantResponse> acceptApplication (@CurrentUser Member member, @PathVariable Long standbyId) {
+    public ResponseEntity<ParticipantResponse> acceptApplication(@CurrentUser Member member, @PathVariable(value = "standbyId") Long standbyId) {
         return ResponseEntity.ok(participantService.acceptApplication(member, standbyId));
     }
 
     @GetMapping("/reject/{standbyId}")
-    public ResponseEntity<NormalResponse> rejectApplication(@CurrentUser Member member, @PathVariable Long standbyId) {
+    public ResponseEntity<NormalResponse> rejectApplication(@CurrentUser Member member, @PathVariable(value = "standbyId") Long standbyId) {
         participantService.rejectApplication(member, standbyId);
         return ResponseEntity.ok(NormalResponse.success());
     }
