@@ -14,9 +14,10 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.addAllowedOriginPattern("https://modoos.vercel.app");
-        config.addAllowedOriginPattern("localhost");
+        config.addAllowedOriginPattern("http://localhost");
         config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
+        config.addExposedHeader("Set-Cookie");
+        config.addAllowedMethod("POST, GET, PUT, OPTIONS, DELETE, HEAD");
 
         source.registerCorsConfiguration("/**", config);
         return source;

@@ -41,7 +41,7 @@ public class AuthController {
                 .domain("modoos.vercel.app")
                 .domain("localhost")
                 .sameSite("None")
-                .httpOnly(false)
+                .httpOnly(true)
                 .secure(true)
                 .maxAge(COOKIE_EXPIRATION)
                 .build();
