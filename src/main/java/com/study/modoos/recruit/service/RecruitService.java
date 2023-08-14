@@ -47,12 +47,15 @@ public class RecruitService {
         Study study = request.createRecruit(currentMember);
         studyRepository.save(study);
 
-        for (String todo : todos) {
-            Todo t = Todo.builder().
-                    study(study)
-                    .content(todo)
-                    .build();
-            todoRepository.save(t);
+        if (todos != null) {
+
+            for (String todo : todos) {
+                Todo t = Todo.builder().
+                        study(study)
+                        .content(todo)
+                        .build();
+                todoRepository.save(t);
+            }
         }
 
         studyRepository.save(study);
