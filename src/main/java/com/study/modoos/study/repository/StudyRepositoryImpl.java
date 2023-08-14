@@ -24,19 +24,19 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.study.modoos.study.entity.QStudy.study;
 import static com.study.modoos.participant.entity.QParticipant.participant;
+import static com.study.modoos.study.entity.QStudy.study;
 
 @Repository
 @RequiredArgsConstructor
 public class StudyRepositoryImpl {
-
     private final JPAQueryFactory queryFactory;
+
 
     public Slice<RecruitListInfoResponse> getSliceOfRecruit(Member member,
                                                             final String title,
                                                             final List<Category> categoryList,
-                                                            Long lastId,
+                                                            final Long lastId,
                                                             Pageable pageable) {
         /*
         if (order.equals("likeCount")) {
@@ -52,7 +52,7 @@ public class StudyRepositoryImpl {
                 .where(
                         titleLike(title),
                         categoryEq(categoryList),
-                        study.id.gt(lastId))
+                        ltStudyId(lastId))
                 //.orderBy(study.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1);
@@ -112,7 +112,7 @@ public class StudyRepositoryImpl {
 
     public Slice<RecruitListInfoResponse> getMyStudyList(Member member, Pageable pageable) {
         JPAQuery<Participant> results = queryFactory.selectFrom(participant)
-                .join(participant.study,study)
+                .join(participant.study, study)
                 .where(participant.member.eq(member))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1);
