@@ -158,7 +158,7 @@ public class RecruitService {
         return studyRepositoryImpl.findMaxRecruitIdx().getId();
     }
     @Transactional
-    public Slice<RecruitListInfoResponse> getMyStudyList(Member member, Pageable pageable) {
-        return studyRepositoryImpl.getMyStudyList(member, pageable);
+    public Slice<RecruitListInfoResponse> getMyStudyList(Member member, String status,Pageable pageable) {
+        return studyRepositoryImpl.getMyStudyList(member, status, pageable);
     }
 }

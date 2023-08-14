@@ -58,8 +58,8 @@ public class RecruitController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<Slice<RecruitListInfoResponse>> getMyStudyList(@CurrentUser Member member,
+    public ResponseEntity<Slice<RecruitListInfoResponse>> getMyStudyList(@CurrentUser Member member,  @RequestParam(required = false) String status,
                                                                      @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable) {
-        return ResponseEntity.ok(recruitService.getMyStudyList(member, pageable));
+        return ResponseEntity.ok(recruitService.getMyStudyList(member, status, pageable));
     }
 }
