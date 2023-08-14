@@ -114,6 +114,10 @@ public class Study extends BaseTimeEntity {
     @OrderBy("id asc")
     private List<Comment> comments;
 
+    @ColumnDefault("0")
+    @Column(name = "heart")
+    private int heart;
+
     @Builder
     public Study(Member leader, String title, String description, int recruits_count,
                  LocalDate recruit_deadline, Channel channel, LocalDate expected_start_at,
@@ -183,6 +187,14 @@ public class Study extends BaseTimeEntity {
 
     public void updateCurrentTurn(int current_turn) {
         this.current_turn = current_turn;
+    }
+
+    public void addHeart() {
+        this.heart++;
+    }
+
+    public void deleteHeart() {
+        this.heart--;
     }
 
     @Override

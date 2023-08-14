@@ -26,6 +26,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 public class RecruitController {
     private final RecruitService recruitService;
 
+
     @PostMapping("/post")
     public ResponseEntity<RecruitIdResponse> createRecruit(@CurrentUser Member member, @RequestBody RecruitRequest recruitRequest) {
         return ResponseEntity.ok(recruitService.postRecruit(member, recruitRequest));
