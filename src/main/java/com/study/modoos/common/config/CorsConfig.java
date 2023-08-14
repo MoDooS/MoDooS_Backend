@@ -13,6 +13,8 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
+        config.addAllowedOrigin("https://modoos.vercel.app");
+        config.addAllowedOrigin("http://localhost:3000");
         config.addAllowedOriginPattern("https://modoos.vercel.app");
         config.addAllowedOriginPattern("http://localhost");
         config.addAllowedHeader("*");
