@@ -39,6 +39,7 @@ public class AuthController {
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh-token", loginResponse.getRefreshToken())
                 .path("/")
                 .domain("modoos.vercel.app")
+                .domain("localhost")
                 .sameSite("None")
                 .httpOnly(false)
                 .secure(true)
