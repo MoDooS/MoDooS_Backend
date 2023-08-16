@@ -7,6 +7,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.study.modoos.common.exception.ErrorCode;
+import com.study.modoos.common.exception.ModoosException;
 import com.study.modoos.member.entity.Member;
 import com.study.modoos.participant.entity.Participant;
 import com.study.modoos.recruit.response.RecruitListInfoResponse;
@@ -30,13 +32,13 @@ import static com.study.modoos.study.entity.QStudy.study;
 @Repository
 @RequiredArgsConstructor
 public class StudyRepositoryImpl {
-
     private final JPAQueryFactory queryFactory;
+
 
     public Slice<RecruitListInfoResponse> getSliceOfRecruit(Member member,
                                                             final String title,
                                                             final List<Category> categoryList,
-                                                            Long lastId,
+                                                            final Long lastId,
                                                             Pageable pageable) {
         /*
         if (order.equals("likeCount")) {
@@ -52,7 +54,7 @@ public class StudyRepositoryImpl {
                 .where(
                         titleLike(title),
                         categoryEq(categoryList),
-                        study.id.gt(lastId))
+                        ltStudyId(lastId))
                 //.orderBy(study.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1);
@@ -111,12 +113,22 @@ public class StudyRepositoryImpl {
         return booleanBuilder;
     }
 
-    public Slice<RecruitListInfoResponse> getMyStudyList(Member member, Pageable pageable) {
+    public Slice<RecruitListInfoResponse> getMyStudyList(Member member, String status, Pageable pageable) {
         JPAQuery<Participant> results = queryFactory.selectFrom(participant)
                 .join(participant.study, study)
                 .where(participant.member.eq(member))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1);
+
+        if ("모집중".equals(status)) {
+            results.where(study.status.eq(0)); // 0: 모집중 상태
+        } else if ("모집완료".equals(status)) {
+            results.where(study.status.eq(1)); // 1: 모집완료 상태
+        } else if ("생성완료".equals(status)) {
+            results.where(study.status.eq(2)); // 2: 스터디 생성 완료 상태
+        } else {
+            throw new ModoosException(ErrorCode.STUDY_STATUS);
+        }
 
         for (Sort.Order o : pageable.getSort()) {
             PathBuilder pathBuilder = new PathBuilder(study.getType(), study.getMetadata());
@@ -129,9 +141,7 @@ public class StudyRepositoryImpl {
                 .map(o -> RecruitListInfoResponse.of(o.getStudy()))
                 .collect(Collectors.toList());
 
-
         boolean hasNext = false;
-
 
         if (contents.size() > pageable.getPageSize()) {
             contents.remove(pageable.getPageSize());
