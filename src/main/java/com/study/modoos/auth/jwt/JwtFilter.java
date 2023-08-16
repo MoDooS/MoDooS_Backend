@@ -19,6 +19,7 @@ import java.io.IOException;
 @Slf4j
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
+    private static final String TOKEN_PREFIX = "Bearer ";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -47,13 +48,9 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     public String resolveToken(HttpServletRequest httpServletRequest) {
-        Cookie[] cookies = httpServletRequest.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("access-token".equals(cookie.getName()) || "accessToken".equals(cookie.getName()) ) {
-                    return cookie.getValue();
-                }
-            }
+        String authorizationToken = httpServletRequest.getHeader("Authorization");
+        if (authorizationToken != null) {
+            return authorizationToken.replace(TOKEN_PREFIX, "");
         }
         return null;
     }
