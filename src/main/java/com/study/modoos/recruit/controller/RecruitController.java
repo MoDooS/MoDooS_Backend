@@ -9,6 +9,7 @@ import com.study.modoos.recruit.response.RecruitIdResponse;
 import com.study.modoos.recruit.response.RecruitInfoResponse;
 import com.study.modoos.recruit.response.RecruitListInfoResponse;
 import com.study.modoos.recruit.service.RecruitService;
+import com.study.modoos.study.entity.StudyStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -73,8 +74,8 @@ public class RecruitController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<Slice<RecruitListInfoResponse>> getMyStudyList(@CurrentUser Member member,  @RequestParam(required = false) String status,
-                                                                     @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable) {
+    public ResponseEntity<Slice<RecruitListInfoResponse>> getMyStudyList(@CurrentUser Member member, @RequestParam(required = false) StudyStatus status,
+                                                                         @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable) {
         return ResponseEntity.ok(recruitService.getMyStudyList(member, status, pageable));
     }
 }
