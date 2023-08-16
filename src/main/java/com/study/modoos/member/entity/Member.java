@@ -103,4 +103,29 @@ public class Member {
     public void updatePassword(String password) {
         this.password = password;
     }
+
+    public void updateScore(Long score) {
+        if (score < 0) {
+            this.score = 0L;
+        }
+        this.score = score;
+    }
+
+    public void updateRanking() {
+        if (this.score >= 1000) {
+            this.ranking = "S+";
+        } else if (this.score >= 800) {
+            this.ranking = "S";
+        } else if (this.score >= 600) {
+            this.ranking = "A+";
+        } else if (this.score >= 400) {
+            this.ranking = "A";
+        } else if (this.score >= 200) {
+            this.ranking = "B";
+        } else if (this.score >= 50) {
+            this.ranking = "C";
+        } else {
+            this.ranking = "?";
+        }
+    }
 }

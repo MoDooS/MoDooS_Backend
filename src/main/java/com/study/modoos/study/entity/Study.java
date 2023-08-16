@@ -46,9 +46,8 @@ public class Study extends BaseTimeEntity {
     private int participants_count;
 
     //0이면 모집중, 1이면 모집완료, 2면 스터디 생성 완료
-    @ColumnDefault("0")
-    @Column(name = "status")
-    private int status;
+    @Enumerated(EnumType.STRING)
+    private StudyStatus status;
 
     @Column(nullable = false)
     private LocalDate recruit_deadline;
@@ -76,7 +75,7 @@ public class Study extends BaseTimeEntity {
 
     @ColumnDefault("0")
     @Column(name = "absent")
-    private int absent;
+    private int absent;     //0이면 스터디 모집중, 1이면 스터디 모집마감, 2면 스터디 진행 중, 3번 스터디 종
 
     @ColumnDefault("0")
     @Column(name = "late")
@@ -114,9 +113,13 @@ public class Study extends BaseTimeEntity {
     @OrderBy("id asc")
     private List<Comment> comments;
 
+    @Column(name = "isEnd")
+    private boolean isEnd;
+
     @ColumnDefault("0")
     @Column(name = "heart")
     private int heart;
+
 
     @Builder
     public Study(Member leader, String title, String description, int recruits_count,
@@ -139,7 +142,7 @@ public class Study extends BaseTimeEntity {
         this.absent = absent;
         this.late = late;
         this.out = out;
-        this.status = 0;
+        this.status = StudyStatus.RECRUITING;
     }
 
     public void update(Campus campus, Channel channel, Category category, LocalDate expected_start_at,
@@ -181,7 +184,7 @@ public class Study extends BaseTimeEntity {
         this.current_turn = 0;
     }
 
-    public void updateStatus(int status) {
+    public void updateStatus(StudyStatus status) {
         this.status = status;
     }
 
@@ -189,6 +192,10 @@ public class Study extends BaseTimeEntity {
         this.current_turn = current_turn;
     }
 
+    public void upadteIsEnd() {
+        this.isEnd = true;
+    }
+  
     public void addHeart() {
         this.heart++;
     }
