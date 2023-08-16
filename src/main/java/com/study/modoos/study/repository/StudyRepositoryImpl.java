@@ -14,6 +14,7 @@ import com.study.modoos.participant.entity.Participant;
 import com.study.modoos.recruit.response.RecruitListInfoResponse;
 import com.study.modoos.study.entity.Category;
 import com.study.modoos.study.entity.Study;
+import com.study.modoos.study.entity.StudyStatus;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -113,19 +114,22 @@ public class StudyRepositoryImpl {
         return booleanBuilder;
     }
 
-    public Slice<RecruitListInfoResponse> getMyStudyList(Member member, String status, Pageable pageable) {
+    public Slice<RecruitListInfoResponse> getMyStudyList(Member member, StudyStatus status, Pageable pageable) {
         JPAQuery<Participant> results = queryFactory.selectFrom(participant)
                 .join(participant.study, study)
                 .where(participant.member.eq(member))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1);
 
-        if ("모집중".equals(status)) {
-            results.where(study.status.eq(0)); // 0: 모집중 상태
-        } else if ("모집완료".equals(status)) {
-            results.where(study.status.eq(1)); // 1: 모집완료 상태
-        } else if ("생성완료".equals(status)) {
-            results.where(study.status.eq(2)); // 2: 스터디 생성 완료 상태
+        if (status.equals(StudyStatus.RECRUITING) || status.equals(StudyStatus.RECRUIT_END)) {
+            results.where(
+                    study.status.eq(StudyStatus.RECRUITING).or(study.status.eq(StudyStatus.RECRUIT_END))
+            );
+            // 0: 모집중 상태
+        } else if (status.equals(StudyStatus.ONGOING)) {
+            results.where(study.status.eq(StudyStatus.ONGOING)); // 진행 중 상태
+        } else if (status.equals(StudyStatus.STUDY_END)) {
+            results.where(study.status.eq(StudyStatus.STUDY_END)); // 2: 스터디 생성 완료 상태
         } else {
             throw new ModoosException(ErrorCode.STUDY_STATUS);
         }

@@ -25,10 +25,9 @@ public enum ErrorCode {
     INVALID_DELETE(HttpStatus.UNAUTHORIZED, "댓글 삭제자와 호출자(현재 사용자)의 정보가 다릅니다.", "댓글 삭제자를 확인해주세요"),
     INVALID_PARENT_ID(HttpStatus.UNAUTHORIZED, "부모 댓글의 스터디 공고글과 현재 작성하는 스터디 공고글이 다릅니다.", "부모 댓글 id를 확인해주세요"),
     TODO_NOT_FOUND(HttpStatus.NOT_FOUND, "체크리스트 항목을 찾을 수 있습니다.", "체크리스트 항목 id가 올바른지 확인해주세요."),
-    INVALID_STUDY(HttpStatus.NOT_FOUND, "해당 스터디의 참여 인원 정보를 가져올 수 없습니다." , "스터디의 참여인원이 있는지 확인해주세요"),
-    FULL_PARTICIPANT(HttpStatus.CONFLICT, "해당 스터디의 참여 인원이 꽉 찼습니다.", "지금은 해당 스터디에 참여신청이 불가합니다.");
-    STUDY_STATUS(HttpStatus.NOT_FOUND, "스터디 상태 입력값이 잘못되었습니다." , "상태값이 null/모집중/모집완료/생성완료 중에 있는지 확인해주세요"),
     INVALID_STUDY(HttpStatus.NOT_FOUND, "해당 스터디의 참여 인원 정보를 가져올 수 없습니다.", "스터디의 참여인원이 있는지 확인해주세요"),
+    FULL_PARTICIPANT(HttpStatus.CONFLICT, "해당 스터디의 참여 인원이 꽉 찼습니다.", "지금은 해당 스터디에 참여신청이 불가합니다."),
+    STUDY_STATUS(HttpStatus.NOT_FOUND, "스터디 상태 입력값이 잘못되었습니다.", "상태값이 null/모집중/모집완료/생성완료 중에 있는지 확인해주세요"),
     MEMBER_NOT_IN_STUDY(HttpStatus.FORBIDDEN, "해당 스터디에 참여인원이 아닙니다.", "스터디에 참여중인지 확인해주세요."),
     RECEIVER_NOT_IN_STUDY(HttpStatus.FORBIDDEN, "평가 회원이 해당 스터디에 참여 인원이 아닙니다.", "스터디에 참여중인지 확인해주세요"),
     NOT_EVALUATION_PERIOD(HttpStatus.FORBIDDEN, "평기 기간이 아닙니다.", "평가기간을 다시 한 번 확인해주세요."),
