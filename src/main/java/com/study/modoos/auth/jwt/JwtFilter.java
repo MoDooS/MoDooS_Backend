@@ -18,6 +18,7 @@ import java.io.IOException;
 @Slf4j
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
+    private static final String TOKEN_PREFIX = "Bearer ";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -26,6 +27,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String accessToken = resolveToken(request);
 
         try { // 정상 토큰인지 검사
+            System.out.println("doFilterInternal validation test");
             if (accessToken != null && jwtProvider.validateAccessToken(accessToken)) {
                 Authentication authentication = jwtProvider.getAuthentication(accessToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -44,11 +46,10 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    // HTTP Request 헤더로부터 토큰 추출
     public String resolveToken(HttpServletRequest httpServletRequest) {
-        String bearerToken = httpServletRequest.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+        String authorizationToken = httpServletRequest.getHeader("Authorization");
+        if (authorizationToken != null) {
+            return authorizationToken.replace(TOKEN_PREFIX, "");
         }
         return null;
     }
