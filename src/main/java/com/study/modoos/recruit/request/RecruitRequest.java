@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -27,11 +28,12 @@ public class RecruitRequest {
     int late;
     int absent;
     int out;
-    String rule_content;
     String title;
     String description;
+    List<String> checkList;
 
     public Study createRecruit(Member member) {
+
         return Study.builder()
                 .campus(campus)
                 .leader(member)
@@ -46,9 +48,9 @@ public class RecruitRequest {
                 .late(late)
                 .absent(absent)
                 .out(out)
-                .rule_content(rule_content)
                 .title(title)
                 .description(description)
                 .build();
+
     }
 }

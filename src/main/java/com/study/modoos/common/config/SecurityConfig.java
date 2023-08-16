@@ -7,6 +7,7 @@ import com.study.modoos.auth.jwt.JwtFilter;
 import com.study.modoos.auth.jwt.JwtProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -40,8 +41,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-//                .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(configurationSource))
-                .cors(AbstractHttpConfigurer::disable)
+                .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(configurationSource))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .headers(AbstractHttpConfigurer::disable)
@@ -61,9 +61,13 @@ public class SecurityConfig {
                                         API_PREFIX + "/auth/login",
                                         API_PREFIX + "/auth/email-confirm",
                                         API_PREFIX + "/auth/email-check",
-                                     
+                                        API_PREFIX + "/recruit/posts",
                                         API_PREFIX + "/auth/changePw",
+                                        API_PREFIX + "/recruit/postInfo/**",
                                         API_PREFIX + "/health-check")
+                                .permitAll()
+                                .requestMatchers(
+                                        HttpMethod.GET,API_PREFIX + "/comment/**")
                                 .permitAll()
                                 .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);

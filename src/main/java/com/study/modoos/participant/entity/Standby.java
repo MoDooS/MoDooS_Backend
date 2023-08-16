@@ -1,20 +1,20 @@
-package com.study.modoos.study.entity;
+package com.study.modoos.participant.entity;
 
+import com.study.modoos.common.entity.BaseTimeEntity;
 import com.study.modoos.member.entity.Member;
+import com.study.modoos.study.entity.Study;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Objects;
-
 @Entity
 @Getter
-@Table(name = "participant")
+@Table(name = "standby")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = {"member", "study"})
-public class Participant {
+public class Standby extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -26,22 +26,8 @@ public class Participant {
     private Study study;
 
     @Builder
-    public Participant(Member member, Study study) {
+    public Standby(Member member, Study study){
         this.member = member;
         this.study = study;
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        else if (!(obj instanceof Participant)) return false;
-        Participant participant = (Participant) obj;
-        return Objects.equals(id, participant.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : 0;
-    }
-
 }

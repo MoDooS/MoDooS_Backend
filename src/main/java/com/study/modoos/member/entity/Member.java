@@ -70,6 +70,24 @@ public class Member {
         this.department = department;
     }
 
+    public Member(Member writer) {
+        this.id = writer.getId();
+        this.nickname = writer.getNickname();
+        this.password = writer.getPassword();
+        this.email = writer.getEmail();
+        this.campus = writer.getCampus();
+        this.ranking = writer.getRanking();
+        this.score = writer.getScore();
+        this.isMember = writer.getIsMember();
+        this.role = writer.getRole();
+        this.department = writer.getDepartment();
+    }
+
+    public Member(Long writerId, String writerNickname) {
+        this.id = writerId;
+        this.nickname = writerNickname;
+    }
+
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }

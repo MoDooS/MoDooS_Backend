@@ -7,7 +7,6 @@ import com.study.modoos.auth.service.AuthService;
 import com.study.modoos.auth.service.EmailService;
 import com.study.modoos.common.response.NormalResponse;
 import com.study.modoos.member.service.MemberService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,23 +33,29 @@ public class AuthController {
         // User 등록 및 Refresh Token 저장
         LoginResponse loginResponse = authService.login(loginRequest);
 
-        // Refresh Token을 HttpOnly 쿠키에 저장하여 전달
-        Cookie refreshTokenCookie = new Cookie("refresh-token", loginResponse.getRefreshToken());
-        refreshTokenCookie.setMaxAge(COOKIE_EXPIRATION);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(true);
-        refreshTokenCookie.setPath("/");
-        response.addCookie(refreshTokenCookie);
+        ResponseCookie accessTokenCookie = ResponseCookie.from("access-token", loginResponse.getAccessToken())
+                .path("/")
+                .domain("localhost")
+                .sameSite("None")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge(COOKIE_EXPIRATION)
+                .build();
 
-        // Access Token을 HttpOnly 쿠키에 담아서 전송
-        Cookie accessTokenCookie = new Cookie("access-token", loginResponse.getAccessToken());
-        accessTokenCookie.setMaxAge(COOKIE_EXPIRATION);
-        accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setSecure(true);
-        accessTokenCookie.setPath("/");
-        response.addCookie(accessTokenCookie);
+        response.addHeader("Set-Cookie", accessTokenCookie.toString());
 
-        // 응답
+
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh-token", loginResponse.getRefreshToken())
+                .path("/")
+                .domain("localhost")
+                .sameSite("None")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge(COOKIE_EXPIRATION)
+                .build();
+
+        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+
         return ResponseEntity.ok()
                 .build();
     }
