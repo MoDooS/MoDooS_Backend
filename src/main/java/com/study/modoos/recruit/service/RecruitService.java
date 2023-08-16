@@ -175,7 +175,7 @@ public class RecruitService {
     }
 
     @Transactional
-    public Slice<RecruitListInfoResponse> getMyStudyList(Member member, String status,Pageable pageable) {
+    public Slice<RecruitListInfoResponse> getMyStudyList(Member member, StudyStatus status, Pageable pageable) {
         return studyRepositoryImpl.getMyStudyList(member, status, pageable);
     }
 }
