@@ -41,6 +41,9 @@ public class ParticipantService {
         Study study = studyRepository.findById(studyId)
                 .orElseThrow(() -> new ModoosException(ErrorCode.STUDY_NOT_FOUND));
 
+        int current_count = participantRepository.countByStudy(study);
+        int recruits_count = study.getRecruits_count();
+
         boolean isParticipant = participantRepository.existsByStudyAndMember(study, currentUser);
         boolean isStandby = standbyRepository.existsByStudyAndMember(study, currentUser);
 
@@ -49,6 +52,9 @@ public class ParticipantService {
         }
         if(isStandby){
             throw new ModoosException(ErrorCode.ALREADY_STANDBY);
+        }
+        if (current_count == recruits_count) {
+            throw new ModoosException(ErrorCode.FULL_PARTICIPANT);
         }
         Standby standby = new Standby(currentUser, study);
         standbyRepository.save(standby);
