@@ -16,5 +16,11 @@ public class LoginResponse {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
+
+    public LoginResponse(String tokenType, String accessToken) {
+        this.tokenType = tokenType;
+        this.accessToken = accessToken;
+        this.refreshToken = null;
+    }
 }
 
