@@ -26,12 +26,13 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 public class RecruitController {
     private final RecruitService recruitService;
 
+
     @PostMapping("/post")
     public ResponseEntity<RecruitIdResponse> createRecruit(@CurrentUser Member member, @RequestBody RecruitRequest recruitRequest) {
         return ResponseEntity.ok(recruitService.postRecruit(member, recruitRequest));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/postInfo/{id}")
     public ResponseEntity<RecruitInfoResponse> getRecruit(@CurrentUser Member member, @PathVariable(value = "id") Long id) {
         return ResponseEntity.ok(recruitService.oneRecruit(member, id));
     }
@@ -40,9 +41,10 @@ public class RecruitController {
     public ResponseEntity<Slice<RecruitListInfoResponse>> getRecruitList(@CurrentUser Member member,
                                                                          @RequestParam(value = "category", defaultValue = "") List<String> category,
                                                                          @RequestParam(value = "searchBy", required = false) String search,
+                                                                         @RequestParam(value = "lastId", required = false) Long lastId,
                                                                          @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable) {
 
-        return ResponseEntity.ok(recruitService.getRecruitList(member, search, category, pageable));
+        return ResponseEntity.ok(recruitService.getRecruitList(member, search, category, lastId, pageable));
 
     }
 
@@ -55,5 +57,11 @@ public class RecruitController {
     public ResponseEntity<NormalResponse> deleteRecruit(@CurrentUser Member member, @PathVariable(value = "id") Long id) {
         recruitService.deleteRecruit(member, id);
         return ResponseEntity.ok(NormalResponse.success());
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<Slice<RecruitListInfoResponse>> getMyStudyList(@CurrentUser Member member,  @RequestParam(required = false) String status,
+                                                                     @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable) {
+        return ResponseEntity.ok(recruitService.getMyStudyList(member, status, pageable));
     }
 }

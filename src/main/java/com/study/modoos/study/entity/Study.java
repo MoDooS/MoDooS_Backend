@@ -6,18 +6,17 @@ import com.study.modoos.member.entity.Campus;
 import com.study.modoos.member.entity.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "study")
 public class Study extends BaseTimeEntity {
@@ -75,9 +74,6 @@ public class Study extends BaseTimeEntity {
     @Column(name = "link")
     private String link;
 
-    @Column(length = 2000)
-    private String rule_content;
-
     @ColumnDefault("0")
     @Column(name = "absent")
     private int absent;
@@ -90,15 +86,25 @@ public class Study extends BaseTimeEntity {
     @Column(name = "outs")
     private int out;
 
-    @Column(updatable = false)
+    @Column
     private LocalDate start_at;
 
-    @Column(updatable = false)
+    @Column
     private LocalDate end_at;
+
+    @Column
+    private LocalTime studyTime;
+
+    @Column
+    private LocalTime endTime;
 
     @ColumnDefault("0")
     @Column(name = "period")
     private int period;
+
+    @ColumnDefault("0")
+    @Column(name = "current_turn")
+    private int current_turn;
 
     @ColumnDefault("0")
     @Column(name = "total_turn")
@@ -108,11 +114,15 @@ public class Study extends BaseTimeEntity {
     @OrderBy("id asc")
     private List<Comment> comments;
 
+    @ColumnDefault("0")
+    @Column(name = "heart")
+    private int heart;
+
     @Builder
     public Study(Member leader, String title, String description, int recruits_count,
                  LocalDate recruit_deadline, Channel channel, LocalDate expected_start_at,
                  LocalDate expected_end_at, Category category, Campus campus, String contact,
-                 String link, String rule_content, int absent, int late, int out) {
+                 String link, int absent, int late, int out) {
         this.leader = leader;
         this.title = title;
         this.description = description;
@@ -126,7 +136,6 @@ public class Study extends BaseTimeEntity {
         this.campus = campus;
         this.contact = contact;
         this.link = link;
-        this.rule_content = rule_content;
         this.absent = absent;
         this.late = late;
         this.out = out;
@@ -135,7 +144,7 @@ public class Study extends BaseTimeEntity {
 
     public void update(Campus campus, Channel channel, Category category, LocalDate expected_start_at,
                        LocalDate expected_end_at, String contact, String link, String title, String description,
-                       int absent, int late, int out, String rule_content) {
+                       int absent, int late, int out) {
         this.title = title;
         this.description = description;
         this.channel = channel;
@@ -145,7 +154,6 @@ public class Study extends BaseTimeEntity {
         this.campus = campus;
         this.contact = contact;
         this.link = link;
-        this.rule_content = rule_content;
         this.absent = absent;
         this.late = late;
         this.out = out;
@@ -159,6 +167,35 @@ public class Study extends BaseTimeEntity {
      * 나중에 여기에 스터디 생성 시 진짜 시작일, 종료일, 회차, 기간 update하는 로직 넣기(생성자 새로 만들지 x)
      */
 
+    public void setStudy(LocalDate start_at, LocalDate end_at, LocalTime studyTime, LocalTime endTime,
+                         int period, int total_turn, int absent, int late, int out) {
+        this.start_at = start_at;
+        this.end_at = end_at;
+        this.studyTime = studyTime;
+        this.endTime = endTime;
+        this.period = period;
+        this.total_turn = total_turn;
+        this.absent = absent;
+        this.late = late;
+        this.out = out;
+        this.current_turn = 0;
+    }
+
+    public void updateStatus(int status) {
+        this.status = status;
+    }
+
+    public void updateCurrentTurn(int current_turn) {
+        this.current_turn = current_turn;
+    }
+
+    public void addHeart() {
+        this.heart++;
+    }
+
+    public void deleteHeart() {
+        this.heart--;
+    }
 
     @Override
     public boolean equals(Object obj) {
