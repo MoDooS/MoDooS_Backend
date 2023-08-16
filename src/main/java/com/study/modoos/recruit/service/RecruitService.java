@@ -15,6 +15,7 @@ import com.study.modoos.recruit.response.RecruitListInfoResponse;
 import com.study.modoos.recruit.response.TodoResponse;
 import com.study.modoos.study.entity.Category;
 import com.study.modoos.study.entity.Study;
+import com.study.modoos.study.entity.StudyStatus;
 import com.study.modoos.study.entity.Todo;
 import com.study.modoos.study.repository.StudyRepository;
 import com.study.modoos.study.repository.StudyRepositoryImpl;
@@ -110,7 +111,7 @@ public class RecruitService {
         }
 
         //스터디가 이미 생성된 모집공고면 삭제 불가능
-        if (study.getStatus() == 2) {
+        if (study.getStatus() == StudyStatus.ONGOING) {
             throw new ModoosException(ErrorCode.STUDY_NOT_EDIT);
         }
 
@@ -159,7 +160,7 @@ public class RecruitService {
         }
 
         //스터디가 이미 생성된 모집공고면 삭제 불가능
-        if (study.getStatus() == 2) {
+        if (study.getStatus() == StudyStatus.ONGOING) {
             throw new ModoosException(ErrorCode.STUDY_NOT_EDIT);
         }
 

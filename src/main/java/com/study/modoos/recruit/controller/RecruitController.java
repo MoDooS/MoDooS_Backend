@@ -10,8 +10,10 @@ import com.study.modoos.recruit.response.RecruitInfoResponse;
 import com.study.modoos.recruit.response.RecruitListInfoResponse;
 import com.study.modoos.recruit.service.RecruitService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +45,18 @@ public class RecruitController {
                                                                          @RequestParam(value = "lastId", required = false) Long lastId,
                                                                          @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable) {
 
-        return ResponseEntity.ok(recruitService.getRecruitList(member, search, category, lastId, pageable));
+        Sort.Direction direction;
+
+        if (pageable.getSort().stream().anyMatch(o -> o.getProperty().equals("recruit_deadLine"))) {
+            direction = Sort.Direction.ASC;
+        } else {
+            direction = DESC;
+        }
+
+        Sort sort = Sort.by(new Sort.Order(direction, pageable.getSort().toString()));
+
+        Pageable pageableWithSort = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        return ResponseEntity.ok(recruitService.getRecruitList(member, search, category, lastId, pageableWithSort));
 
     }
 
@@ -60,7 +73,7 @@ public class RecruitController {
 
     @GetMapping("/my")
     public ResponseEntity<Slice<RecruitListInfoResponse>> getMyStudyList(@CurrentUser Member member,
-                                                                     @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable) {
+                                                                         @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable) {
         return ResponseEntity.ok(recruitService.getMyStudyList(member, pageable));
     }
 }

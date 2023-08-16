@@ -24,8 +24,8 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.study.modoos.study.entity.QStudy.study;
 import static com.study.modoos.participant.entity.QParticipant.participant;
+import static com.study.modoos.study.entity.QStudy.study;
 
 @Repository
 @RequiredArgsConstructor
@@ -56,6 +56,7 @@ public class StudyRepositoryImpl {
                 //.orderBy(study.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1);
+
 
         for (Sort.Order o : pageable.getSort()) {
             PathBuilder pathBuilder = new PathBuilder(study.getType(), study.getMetadata());
@@ -112,7 +113,7 @@ public class StudyRepositoryImpl {
 
     public Slice<RecruitListInfoResponse> getMyStudyList(Member member, Pageable pageable) {
         JPAQuery<Participant> results = queryFactory.selectFrom(participant)
-                .join(participant.study,study)
+                .join(participant.study, study)
                 .where(participant.member.eq(member))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1);
