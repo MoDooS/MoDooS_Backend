@@ -4,6 +4,7 @@ import com.study.modoos.member.entity.Campus;
 import com.study.modoos.study.entity.Category;
 import com.study.modoos.study.entity.Channel;
 import com.study.modoos.study.entity.Study;
+import com.study.modoos.study.entity.StudyStatus;
 import com.study.modoos.study.response.StudyParticipantResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,7 +31,7 @@ public class RecruitInfoResponse {
 
     private String description;
 
-    private int status;
+    private StudyStatus status;
 
     private Category category;
 
@@ -58,6 +59,12 @@ public class RecruitInfoResponse {
 
     private List<StudyParticipantResponse> participantList;
 
+    private int late;
+
+    private int absent;
+
+    private int out;
+
     public static RecruitInfoResponse of(Study study, boolean isWritten, List<TodoResponse> checkList,
                                          List<StudyParticipantResponse> participantList) {
         return RecruitInfoResponse.builder()
@@ -81,6 +88,9 @@ public class RecruitInfoResponse {
                 .isWritten(isWritten)
                 .checkList(checkList)
                 .participantList(participantList)
+                .late(study.getLate())
+                .absent(study.getAbsent())
+                .out(study.getOut())
                 .build();
     }
 }

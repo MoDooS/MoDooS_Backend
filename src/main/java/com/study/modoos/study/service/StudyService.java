@@ -12,6 +12,7 @@ import com.study.modoos.participant.repository.ParticipantRepository;
 import com.study.modoos.recruit.response.RecruitIdResponse;
 import com.study.modoos.recruit.response.TodoResponse;
 import com.study.modoos.study.entity.Study;
+import com.study.modoos.study.entity.StudyStatus;
 import com.study.modoos.study.entity.Todo;
 import com.study.modoos.study.repository.StudyRepository;
 import com.study.modoos.study.repository.TodoRepository;
@@ -74,7 +75,7 @@ public class StudyService {
         study.setStudy(request.getStart_at(), request.getEnd_at(), request.getStudyTime(),
                 request.getEndTime(), request.getPeriod(), request.getTotal_turn(),
                 request.getAbsent(), request.getLate(), request.getOut());
-        study.updateStatus(2);  //스터디 생성 완료 상태로 변경
+        study.updateStatus(StudyStatus.ONGOING);  //스터디 생성 완료 상태로 변경
         studyRepository.save(study);
         return RecruitIdResponse.of(study);
     }
@@ -118,6 +119,9 @@ public class StudyService {
                 participant.updateLate(participant.getLate() + 1);
             else if (oneAttendance.getAttendance().equals(Attendance.ABSENT))
                 participant.updateAbsent(participant.getAbsent() + 1);
+            else if (oneAttendance.getAttendance().equals(Attendance.ATTEND)) {
+                participant.getMember().updateScore(participant.getMember().getScore() + 5);
+            }
 
             //지각부터 처리
             while (participant.getLate() >= study.getLate()) {
@@ -128,11 +132,15 @@ public class StudyService {
             //결석 처리
             while (participant.getAbsent() >= study.getAbsent()) {
                 participant.updateAbsent(participant.getAbsent() - study.getAbsent());
-                participant.updateAbsent(participant.getOut() + 1);
+                participant.updateOut(participant.getOut() + 1);
+                //아웃카운트 하나 늘 때마다 -30점
+                participant.getMember().updateScore(participant.getMember().getScore() - 30);
+                participant.getMember().updateRanking();
             }
 
             //참가자의 outcount가 넘으면 퇴출
             if (participant.getOut() >= study.getOut()) {
+                participant.getMember().updateScore(participant.getMember().getScore() - 200);
                 participantRepository.delete(participant);
                 study.setParticipants_count(study.getParticipants_count() - 1);
                 continue;
@@ -373,6 +381,7 @@ public class StudyService {
             return StudyInfoResponse.of(study, member, todoResponseList, null, studyParticipantResponseList);
         }
 
+        //해당 주차에 받은 피드백들
         feedbacks = feedbackRepository.findByReceiverAndStudyAndTimes(thisParticipant, study, idx);
 
 
@@ -384,26 +393,29 @@ public class StudyService {
             countMap.put(todo.getId(), 0);
         }
 
-        for (Feedback feedback : feedbacks) {
-            List<FeedbackTodo> feedbackTodoList = feedbackTodoRepository.findFeedbackTodoByFeedback(feedback);
+        if (feedbacks != null) {
 
-            for (FeedbackTodo feedbackTodo : feedbackTodoList) {
-                countMap.put(feedbackTodo.getTodo().getId(), countMap.get(feedbackTodo.getTodo().getId()) + 1);
-            }
+            for (Feedback feedback : feedbacks) {
+                List<FeedbackTodo> feedbackTodoList = feedbackTodoRepository.findFeedbackTodoByFeedback(feedback);
 
-            if (feedback.getPositive() != null) {
-                if (positiveMap.containsKey(feedback.getPositive())) {
-                    positiveMap.put(feedback.getPositive(), positiveMap.get(feedback.getPositive()) + 1);
-                } else {
-                    positiveMap.put(feedback.getPositive(), 1);
+                for (FeedbackTodo feedbackTodo : feedbackTodoList) {
+                    countMap.put(feedbackTodo.getTodo().getId(), countMap.get(feedbackTodo.getTodo().getId()) + 1);
                 }
-            }
 
-            if (feedback.getNegative() != null) {
-                if (negativeMap.containsKey(feedback.getNegative())) {
-                    negativeMap.put(feedback.getNegative(), negativeMap.get(feedback.getNegative()) + 1);
-                } else {
-                    negativeMap.put(feedback.getNegative(), 1);
+                if (feedback.getPositive() != null) {
+                    if (positiveMap.containsKey(feedback.getPositive())) {
+                        positiveMap.put(feedback.getPositive(), positiveMap.get(feedback.getPositive()) + 1);
+                    } else {
+                        positiveMap.put(feedback.getPositive(), 1);
+                    }
+                }
+
+                if (feedback.getNegative() != null) {
+                    if (negativeMap.containsKey(feedback.getNegative())) {
+                        negativeMap.put(feedback.getNegative(), negativeMap.get(feedback.getNegative()) + 1);
+                    } else {
+                        negativeMap.put(feedback.getNegative(), 1);
+                    }
                 }
             }
         }
@@ -456,6 +468,27 @@ public class StudyService {
         if (feedbacks.size() == 0)
             return StudyInfoResponse.of(study, member, todoResponseList, null, studyParticipantResponseList);
 
+        reflectFeedbacksScore(idx, study);
+
+        if (idx == study.getTotal_turn()) { //마지막 주차이면 완주 반영했는지 확인
+            if (!study.isEnd()) { //완주 반영 안 됐으면
+                study.upadteIsEnd();    //완주 반영
+                study.updateStatus(StudyStatus.STUDY_END);
+
+                List<Participant> participantList = participantRepository.findByStudy(study);
+
+                //완주한 참가자들한테 +200점
+                for (Participant participant : participantList) {
+                    Member tempMember = participant.getMember();
+
+                    tempMember.updateScore(tempMember.getScore() + 200);
+                    tempMember.updateRanking();
+                    memberRepository.save(tempMember);
+                }
+                studyRepository.save(study);
+            }
+        }
+
         return StudyInfoResponse.of(study, member, todoResponseList, feedbackResponse, studyParticipantResponseList);
     }
 
@@ -474,11 +507,14 @@ public class StudyService {
 
             for (Participant participant : participantList) {
                 for (int i = start + 1; i < idx; i++) {
-                    participant.getAttendanceList().add(Attendance.ATTEND);
+                    participant.getAttendanceList().add(Attendance.ATTEND); //출석으로 인정해줌
+                    participant.getMember().updateScore(participant.getMember().getScore() + 5);  //출석인정되었으므로 +5점
                 }
 
-                if (!isEvaluation)   //평가 기간이 아니면 더해줘야 함
+                if (!isEvaluation) { //평가 기간이 아니면 더해줘야 함
                     participant.getAttendanceList().add(Attendance.ATTEND);
+                    participant.getMember().updateScore(participant.getMember().getScore() + 5);
+                }
                 participantRepository.save(participant);
             }
         }
@@ -556,6 +592,67 @@ public class StudyService {
 
         fillEmptyAttendance(study, idx, isEvaluation);
         return isEvaluation;
+    }
+
+    public void reflectFeedbacksScore(int idx, Study study) {
+        List<Participant> participantList = participantRepository.findByStudy(study);
+
+        for (int i = 1; i <= idx; i++) {    // 주차별 확인
+            int[] notWritten = new int[participantList.size()]; //해당 주차 피드백 작성 유무(작성했으면 +1)
+            boolean flag = false;   //피드백 그 주차 안 한 사람 반영 유무
+
+            for (int j = 0; j < participantList.size(); j++) {
+                Participant thisParticipant = participantList.get(i);
+                int score = 0;
+                List<Feedback> feedbacks = feedbackRepository.findByReceiverAndStudyAndTimes(thisParticipant, study, idx);
+
+                if (feedbacks == null) { //피드백 자체가 아예 없으면 다른 사람 피드백을 확인
+                    continue;
+                } else if (!feedbacks.get(0).isReflected()) {
+                    flag = true;
+                    for (Feedback feedback : feedbacks) {
+                        Participant sender = feedback.getSender();
+                        int senderIdx = participantList.indexOf(sender);
+                        score += feedback.getParticipate();
+
+                        notWritten[senderIdx]++;
+                        feedback.updateIsReflected();
+                        feedbackRepository.save(feedback);
+                    }
+                    Member member = thisParticipant.getMember();
+
+                    //평균 점수따라 계산
+                    if (score / feedbacks.size() >= 4) {
+                        member.updateScore(member.getScore() + 20);
+                    } else if (score / feedbacks.size() >= 3) {
+                        member.updateScore(member.getScore());
+                    } else {
+                        member.updateScore(member.getScore() - 20);
+                    }
+                    member.updateRanking();
+                    memberRepository.save(member);
+                }
+            }
+
+            //아직 반영 안 했던 스터디라면 피드백 유무에 따라 점수 반영해야 함
+            if (flag) {
+                for (int j = 0; j < participantList.size(); j++) {
+                    Participant participant = participantList.get(j);
+                    Member member = participant.getMember();
+
+                    if (notWritten[j] == participantList.size() - 1) {
+                        member.updateScore(member.getScore() + 5);
+                        member.updateRanking();
+                    } else if (notWritten[j] != participantList.size() - 1) {
+                        member.updateScore(member.getScore() - 20);
+                        member.updateRanking();
+                        memberRepository.save(member);
+                    }
+                }
+            }
+        }
+
+
     }
 
 

@@ -59,6 +59,7 @@ public class StudyRepositoryImpl {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1);
 
+
         for (Sort.Order o : pageable.getSort()) {
             PathBuilder pathBuilder = new PathBuilder(study.getType(), study.getMetadata());
             results.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC :

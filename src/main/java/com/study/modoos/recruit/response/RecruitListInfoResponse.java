@@ -2,6 +2,7 @@ package com.study.modoos.recruit.response;
 
 import com.study.modoos.study.entity.Category;
 import com.study.modoos.study.entity.Study;
+import com.study.modoos.study.entity.StudyStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +25,7 @@ public class RecruitListInfoResponse {
 
     private String title;
 
-    private int status;
+    private StudyStatus status;
 
     private Category category;
 
