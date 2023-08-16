@@ -33,13 +33,10 @@ public class AuthController {
         // User 등록 및 Refresh Token 저장
         LoginResponse loginResponse = authService.login(loginRequest);
 
-        // Access Token과 TokenType을 함께 헤더에 담아서 전송
-        response.setHeader(HttpHeaders.AUTHORIZATION, loginResponse.getTokenType() + " " + loginResponse.getAccessToken());
-
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh-token", loginResponse.getRefreshToken())
                 .path("/")
                 .domain("modoos.vercel.app")
-                .domain("localhost")
+                .domain(".localhost")
                 .sameSite("None")
                 .httpOnly(true)
                 .secure(true)
@@ -48,8 +45,7 @@ public class AuthController {
 
         response.addHeader("Set-Cookie", refreshTokenCookie.toString());
 
-        return ResponseEntity.ok()
-                .build();
+        return ResponseEntity.ok( new LoginResponse(loginResponse.getTokenType(), loginResponse.getAccessToken()));
     }
 
 
