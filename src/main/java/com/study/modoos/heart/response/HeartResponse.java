@@ -25,7 +25,7 @@ public class HeartResponse {
     private String leader_nickname;
 
     private String leader_ranking;
-
+    
     private String title;
 
     private String description;

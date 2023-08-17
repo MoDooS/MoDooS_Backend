@@ -113,6 +113,7 @@ public class Study extends BaseTimeEntity {
     @OrderBy("id asc")
     private List<Comment> comments;
 
+    @ColumnDefault("false")
     @Column(name = "isEnd")
     private boolean isEnd;
 
@@ -143,6 +144,7 @@ public class Study extends BaseTimeEntity {
         this.late = late;
         this.out = out;
         this.status = StudyStatus.RECRUITING;
+        this.isEnd = false;
     }
 
     public void update(Campus campus, Channel channel, Category category, LocalDate expected_start_at,
@@ -195,7 +197,7 @@ public class Study extends BaseTimeEntity {
     public void upadteIsEnd() {
         this.isEnd = true;
     }
-  
+
     public void addHeart() {
         this.heart++;
     }
