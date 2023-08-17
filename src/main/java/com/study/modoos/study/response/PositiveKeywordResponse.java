@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PositiveKeywordResponse {
 
-    private int count;
+    private Long count;
 
     private Positive positive;
 }
