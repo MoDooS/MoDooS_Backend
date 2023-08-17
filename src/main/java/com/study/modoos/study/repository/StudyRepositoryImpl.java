@@ -24,6 +24,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,11 +36,38 @@ import static com.study.modoos.study.entity.QStudy.study;
 public class StudyRepositoryImpl {
     private final JPAQueryFactory queryFactory;
 
+    //no-offset 방식 처리
+    private BooleanExpression ltStudyId(@Nullable Long studyId, Study lastStudy, String sortBy) {
+        BooleanExpression condition = null;
+
+        if (studyId == null) {
+            return null;
+        }
+
+        if (sortBy.equals("createdAt")) {
+            condition = study.createdAt.lt(lastStudy.getCreatedAt())
+                    .or(study.createdAt.eq(lastStudy.getCreatedAt())
+                            .and(study.id.gt(lastStudy.getId()))
+                    );
+        } else if (sortBy.equals("recruit_deadline")) {
+            condition = study.recruit_deadline.gt(lastStudy.getRecruit_deadline())
+                    .or(study.recruit_deadline.eq(lastStudy.getRecruit_deadline())
+                            .and(study.id.gt(lastStudy.getId())));
+        } else if (sortBy.equals("heart")) {
+            condition = study.heart.lt(lastStudy.getHeart())
+                    .or(study.heart.eq(lastStudy.getHeart())
+                            .and(study.id.gt(lastStudy.getId()))
+                    );
+        }
+        return condition;
+    }
 
     public Slice<RecruitListInfoResponse> getSliceOfRecruit(Member member,
                                                             final String title,
                                                             final List<Category> categoryList,
                                                             final Long lastId,
+                                                            Study lastStudy,
+                                                            String sortBy,
                                                             Pageable pageable) {
         /*
         if (order.equals("likeCount")) {
@@ -51,21 +79,28 @@ public class StudyRepositoryImpl {
 
         }
         */
+
+        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
+
+        if (sortBy.equals("createdAt")) {
+            orderSpecifiers.add(study.createdAt.desc());
+        } else if (sortBy.equals("recruit_deadline")) {
+            orderSpecifiers.add(study.recruit_deadline.asc());
+            orderSpecifiers.add(study.id.asc());
+        } else if (sortBy.equals("heart")) {
+            orderSpecifiers.add(study.heart.desc());
+            orderSpecifiers.add(study.id.asc());
+        }
+
         JPAQuery<Study> results = queryFactory.selectFrom(study)
                 .where(
                         titleLike(title),
                         categoryEq(categoryList),
-                        ltStudyId(lastId))
+                        ltStudyId(lastId, lastStudy, sortBy))
                 //.orderBy(study.createdAt.desc())
+                .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1);
-
-
-        for (Sort.Order o : pageable.getSort()) {
-            PathBuilder pathBuilder = new PathBuilder(study.getType(), study.getMetadata());
-            results.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC :
-                    Order.DESC, pathBuilder.get(o.getProperty())));
-        }
 
         List<RecruitListInfoResponse> contents = results.fetch()
                 .stream()
@@ -89,12 +124,6 @@ public class StudyRepositoryImpl {
                 .orderBy(study.id.desc())
                 .fetchFirst();
     }
-
-    //no-offset 방식 처리
-    private BooleanExpression ltStudyId(@Nullable Long studyId) {
-        return studyId == null ? null : study.id.lt(studyId);
-    }
-
 
     //제목 검색어로 검색
     private BooleanExpression titleLike(final String title) {
@@ -140,10 +169,12 @@ public class StudyRepositoryImpl {
                     Order.DESC, pathBuilder.get(o.getProperty())));
         }
 
+
         List<RecruitListInfoResponse> contents = results.fetch()
                 .stream()
                 .map(o -> RecruitListInfoResponse.of(o.getStudy()))
                 .collect(Collectors.toList());
+
 
         boolean hasNext = false;
 

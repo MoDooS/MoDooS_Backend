@@ -92,14 +92,23 @@ public class RecruitService {
         return RecruitInfoResponse.of(study, false, checkList, participantResponseList);
     }
 
-    public Slice<RecruitListInfoResponse> getRecruitList(Member member, String search, List<String> categoryList, Long lastId, Pageable pageable) {
+    public Slice<RecruitListInfoResponse> getRecruitList(Member member, String search, List<String> categoryList, Long lastId, String sortBy, Pageable pageable) {
 
         List<Category> categories = new ArrayList<>();
 
         for (String s : categoryList) {
             categories.add(Category.resolve(s));
         }
-        return studyRepositoryImpl.getSliceOfRecruit(member, search, categories, lastId, pageable);
+
+        Study lastStudy;
+
+        if (lastId == null) {
+            lastStudy = null;
+        } else {
+            lastStudy = studyRepository.findById(lastId)
+                    .orElse(null);
+        }
+        return studyRepositoryImpl.getSliceOfRecruit(member, search, categories, lastId, lastStudy, sortBy, pageable);
     }
 
     @Transactional
