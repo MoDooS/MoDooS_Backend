@@ -6,6 +6,10 @@ import com.study.modoos.member.entity.Member;
 import com.study.modoos.study.entity.Study;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface HeartRepository extends JpaRepository<Heart, Long> {
     Heart findByMemberAndStudy(Member currentUser, Study study);
+
+    List<Heart> findByMember(Member member);
 }

@@ -7,7 +7,8 @@ import com.study.modoos.member.entity.Member;
 import com.study.modoos.member.request.ChangeMemberInfoRequest;
 import com.study.modoos.member.request.MemberJoinRequest;
 import com.study.modoos.member.request.MemberNicknameCheckRequest;
-import com.study.modoos.member.response.MemberInfoResponse;
+import com.study.modoos.member.response.MemberProfileResponse;
+import com.study.modoos.member.response.MyInfoResponse;
 import com.study.modoos.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +25,8 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/myInfo")
-    public ResponseEntity<MemberInfoResponse> getMyMemberInfo(@CurrentUser Member member) {
-        MemberInfoResponse response = memberService.getMemberInfo(member);
+    public ResponseEntity<MyInfoResponse> getMyMemberInfo(@CurrentUser Member member) {
+        MyInfoResponse response = memberService.getMyInfo(member);
         return ResponseEntity.ok(response);
     }
 
@@ -48,5 +49,10 @@ public class MemberController {
             return ResponseEntity.ok(NormalResponse.fail());
         }
         return ResponseEntity.ok(NormalResponse.success());
+    }
+
+    @GetMapping("/profile/{memberId}")
+    public ResponseEntity<MemberProfileResponse> getMemberProfile(@CurrentUser Member member, @PathVariable(value = "memberId") Long memberId) {
+        return ResponseEntity.ok(memberService.getMemberProfile(member, memberId));
     }
 }
