@@ -54,5 +54,4 @@ public class HeartRepositoryImpl {
 
         return new SliceImpl<>(contents, pageable, hasNext);
     }
-
 }
