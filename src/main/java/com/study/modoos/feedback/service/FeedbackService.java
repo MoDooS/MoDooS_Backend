@@ -1,11 +1,13 @@
 package com.study.modoos.feedback.service;
 
+import com.study.modoos.common.exception.ErrorCode;
+import com.study.modoos.common.exception.ModoosException;
 import com.study.modoos.feedback.entity.Negative;
 import com.study.modoos.feedback.entity.Positive;
-import com.study.modoos.feedback.repository.FeedbackRepository;
 import com.study.modoos.feedback.repository.FeedbackRepositoryImpl;
-import com.study.modoos.feedback.response.MyFeedbackResponse;
+import com.study.modoos.feedback.response.MemberFeedbackResponse;
 import com.study.modoos.member.entity.Member;
+import com.study.modoos.member.repository.MemberRepository;
 import com.study.modoos.participant.entity.Participant;
 import com.study.modoos.participant.repository.ParticipantRepository;
 import com.study.modoos.study.response.NegativeKeywordResponse;
@@ -22,15 +24,18 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 public class FeedbackService {
-    private final FeedbackRepository feedbackRepository;
-
     private final FeedbackRepositoryImpl feedbackRepositoryImpl;
 
     private final ParticipantRepository participantRepository;
 
-    public MyFeedbackResponse getMyFeedbacks(Member currentMember) {
+    private final MemberRepository memberRepository;
+
+    public MemberFeedbackResponse getMemberFeedbacks(Member currentMember, Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_FOUND));
+
         //현재 유저의 참여 리스트
-        List<Participant> participantList = participantRepository.findByMember(currentMember);
+        List<Participant> participantList = participantRepository.findByMember(member);
 
         //해시맵 사용
         HashMap<Positive, Long> positiveMap = new HashMap<>();
@@ -83,9 +88,22 @@ public class FeedbackService {
             negativeList.add(response);
         }
 
-        return MyFeedbackResponse.builder()
-                .positiveList(positiveList)
-                .negativeList(negativeList)
-                .build();
+        if (member.getId().equals(currentMember.getId())) {
+            return MemberFeedbackResponse.builder()
+                    .isSelf(true)
+                    .id(member.getId())
+                    .nickname(member.getNickname())
+                    .positiveList(positiveList)
+                    .negativeList(negativeList)
+                    .build();
+        } else {
+            return MemberFeedbackResponse.builder()
+                    .isSelf(false)
+                    .id(member.getId())
+                    .nickname(member.getNickname())
+                    .positiveList(positiveList)
+                    .negativeList(negativeList)
+                    .build();
+        }
     }
 }
