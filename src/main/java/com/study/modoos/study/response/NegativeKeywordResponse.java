@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class NegativeKeywordResponse {
-    private int count;
+    private Long count;
 
     private Negative negative;
 }
