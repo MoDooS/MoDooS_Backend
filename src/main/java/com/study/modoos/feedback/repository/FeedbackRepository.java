@@ -14,4 +14,6 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     List<Feedback> findByReceiverAndStudyAndTimes(Participant receiver, Study study, int times);
 
     List<Feedback> findBySenderAndStudyAndTimes(Participant sender, Study study, int times);
+
+    List<Feedback> findByReceiver(Participant receiver);
 }

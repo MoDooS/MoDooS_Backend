@@ -386,8 +386,8 @@ public class StudyService {
 
 
         HashMap<Long, Integer> countMap = new HashMap<>();
-        HashMap<Positive, Integer> positiveMap = new HashMap<>();
-        HashMap<Negative, Integer> negativeMap = new HashMap<>();
+        HashMap<Positive, Long> positiveMap = new HashMap<>();
+        HashMap<Negative, Long> negativeMap = new HashMap<>();
 
         for (Todo todo : todoList) {
             countMap.put(todo.getId(), 0);
@@ -406,7 +406,7 @@ public class StudyService {
                     if (positiveMap.containsKey(feedback.getPositive())) {
                         positiveMap.put(feedback.getPositive(), positiveMap.get(feedback.getPositive()) + 1);
                     } else {
-                        positiveMap.put(feedback.getPositive(), 1);
+                        positiveMap.put(feedback.getPositive(), 1L);
                     }
                 }
 
@@ -414,7 +414,7 @@ public class StudyService {
                     if (negativeMap.containsKey(feedback.getNegative())) {
                         negativeMap.put(feedback.getNegative(), negativeMap.get(feedback.getNegative()) + 1);
                     } else {
-                        negativeMap.put(feedback.getNegative(), 1);
+                        negativeMap.put(feedback.getNegative(), 1L);
                     }
                 }
             }
@@ -451,11 +451,11 @@ public class StudyService {
         }
 
         Collections.sort(positiveKeywordResponses, (o1, o2) -> {
-            return o2.getCount() - o1.getCount();
+            return Long.compare(o2.getCount(), o1.getCount());
         });
 
         Collections.sort(negativeKeywordResponses, (o1, o2) -> {
-            return o2.getCount() - o1.getCount();
+            return Long.compare(o2.getCount(), o1.getCount());
         });
 
         FeedbackResponse feedbackResponse = FeedbackResponse.builder()
