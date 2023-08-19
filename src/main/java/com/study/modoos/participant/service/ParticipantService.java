@@ -90,6 +90,9 @@ public class ParticipantService {
 
         standbyRepository.delete(standby);
 
+        Alarm alarm = new Alarm(currentUser, study, null, String.format("%s 스터디 신청이 수락되었습니다.",study.getTitle()), AlarmType.STUDY_ACCEPT);
+        alarmRepository.save(alarm);
+
         return ParticipantResponse.of(participant_confirm);
     }
 
@@ -103,6 +106,9 @@ public class ParticipantService {
         if (!study.getLeader().equals(currentUser)) {
             throw new ModoosException(ErrorCode.FORBIDDEN_STUDY_ACCEPT);
         }
+
+        Alarm alarm = new Alarm(currentUser, study, null, String.format("%s 스터디 신청이 거절되었습니다.",study.getTitle()), AlarmType.STUDY_REJECT);
+        alarmRepository.save(alarm);
 
         standbyRepository.delete(standby);
     }
