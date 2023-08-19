@@ -1,5 +1,8 @@
 package com.study.modoos.comment.service;
 
+import com.study.modoos.alarm.entity.Alarm;
+import com.study.modoos.alarm.entity.AlarmType;
+import com.study.modoos.alarm.repository.AlarmRepository;
 import com.study.modoos.comment.entity.Comment;
 import com.study.modoos.comment.mapper.CommentRequestMapper;
 import com.study.modoos.comment.repository.CommentRepository;
@@ -23,6 +26,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final StudyRepository studyRepository;
     private final CommentRequestMapper commentRequestMapper;
+    private final AlarmRepository alarmRepository;
 
     public List<CommentResponse> getComment(Long recruitId) {
         Study recruit = studyRepository.findById(recruitId)
@@ -47,6 +51,17 @@ public class CommentService {
         comment.updateWriter(currentUser);
         comment.updateStudy(recruit);
         commentRepository.save(comment);
+
+        //답댓글인 경우
+        if (commentRequest.getParentId() != null){
+            Alarm alarm = new Alarm(comment.getParent().getWriter(), recruit, comment, String.format("%s 가 %s 스터디의 회원님의 댓글에 대댓글을 작성하였습니다.",currentUser.getNickname(),recruit.getTitle()), AlarmType.REPLY_OF_MY_COMMENT);
+            alarmRepository.save(alarm);
+        }
+        //댓글인 경우
+        else{
+            Alarm alarm = new Alarm(recruit.getLeader(), recruit, comment, String.format("%s 가 회원님의 %s 스터디에 댓글을 작성하였습니다.",currentUser.getNickname(), recruit.getTitle()), AlarmType.MY_STUDY_COMMENT);
+            alarmRepository.save(alarm);
+        }
     }
 
     public void updateComment(Member currentUser, Long commentId, CommentRequest commentRequest) {
