@@ -1,5 +1,8 @@
 package com.study.modoos.participant.service;
 
+import com.study.modoos.alarm.entity.Alarm;
+import com.study.modoos.alarm.entity.AlarmType;
+import com.study.modoos.alarm.repository.AlarmRepository;
 import com.study.modoos.common.exception.ErrorCode;
 import com.study.modoos.common.exception.ModoosException;
 import com.study.modoos.member.entity.Member;
@@ -30,6 +33,7 @@ public class ParticipantService {
     private final MemberRepository memberRepository;
     private final StudyRepository studyRepository;
     private final StandbyRepositoryImpl standbyRepositoryImpl;
+    private final AlarmRepository alarmRepository;
 
     public Slice<AllApplicationResponse> getAllApply(Member member, Pageable page) {
         return standbyRepositoryImpl.getSliceOfAllApplication(member, page);
@@ -59,6 +63,10 @@ public class ParticipantService {
         Standby standby = new Standby(currentUser, study);
         standbyRepository.save(standby);
         Standby standby_waiter = standbyRepository.findByMemberAndStudy(currentUser, study);
+
+        Alarm alarm = new Alarm(study.getLeader(), study, null, String.format("%s 가 %s 스터디를 신청하였습니다.",currentUser.getNickname(),study.getTitle()), AlarmType.STUDY_CONFRIM);
+        alarmRepository.save(alarm);
+
         return StandbyResponse.of(standby_waiter);
     }
 
