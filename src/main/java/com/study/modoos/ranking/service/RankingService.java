@@ -34,11 +34,20 @@ public class RankingService {
 
         int currentRank = rankedMembersSlice.getNumber() * rankedMembersSlice.getSize() + 1;
         long currentScore = rankingList.isEmpty() ? -1 : rankingList.get(0).getScore();
+        int currentRankCnt = 0;
 
         for (RankingResponse response : rankingList) {
             if (response.getScore() < currentScore) {
-                currentRank++;
+                if (currentRankCnt != 0){
+                    currentRank+=currentRankCnt;
+                } else {
+                    currentRank++;
+                }
                 currentScore = response.getScore();
+            } else if (response.getScore() == currentScore) {
+                currentRankCnt ++;
+            } else {
+                currentRankCnt = 0;
             }
             response.setRankingNumber((long) currentRank);
         }
