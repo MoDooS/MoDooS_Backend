@@ -50,4 +50,8 @@ public class Alarm extends BaseTimeEntity {
     public Long getCommentId(Alarm alarm) {
         return alarm.comment != null ? alarm.comment.getId() : null;
     }
+
+    public void readAlarm(boolean isRead){
+        this.isRead = isRead;
+    }
 }
