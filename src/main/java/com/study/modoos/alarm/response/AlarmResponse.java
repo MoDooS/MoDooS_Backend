@@ -17,6 +17,7 @@ public class AlarmResponse {
     private String content;
     private Long commentId;
     private AlarmType alarmType;
+    private boolean isRead;
 
     public static AlarmResponse of(Alarm alarm) {
         AlarmResponse response = new AlarmResponse();
@@ -28,6 +29,7 @@ public class AlarmResponse {
         response.content = alarm.getContent();
         response.commentId = alarm.getComment().getId();
         response.alarmType = alarm.getAlarmType();
+        response.isRead = alarm.isRead();
         return response;
     }
 }
