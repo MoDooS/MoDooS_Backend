@@ -64,7 +64,7 @@ public class ParticipantService {
         standbyRepository.save(standby);
         Standby standby_waiter = standbyRepository.findByMemberAndStudy(currentUser, study);
 
-        Alarm alarm = new Alarm(study.getLeader(), study, null, String.format("%s 가 %s 스터디를 신청하였습니다.",currentUser.getNickname(),study.getTitle()), AlarmType.STUDY_CONFRIM);
+        Alarm alarm = new Alarm(study.getLeader(), study, null, String.format("%s 이(가) %s 스터디를 신청하였습니다.",currentUser.getNickname(),study.getTitle()), AlarmType.STUDY_CONFRIM);
         alarmRepository.save(alarm);
 
         return StandbyResponse.of(standby_waiter);

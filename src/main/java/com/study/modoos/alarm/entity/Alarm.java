@@ -9,7 +9,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -38,12 +37,17 @@ public class Alarm extends BaseTimeEntity {
     private boolean isRead;
 
     @Builder
-    public Alarm(Member member, Study study, Comment comment, String content, AlarmType alarmType) {
+    public Alarm(Member member, Study study, Comment comment, String content,AlarmType alarmType) {
         this.member = member;
-        this.study =study;
+        this.study = study;
         this.comment = comment;
         this.content = content;
         this.alarmType = alarmType;
         this.isRead = false;
+    }
+
+    // comment 필드가 null인 경우를 고려하여 commentId 반환 메서드 추가
+    public Long getCommentId(Alarm alarm) {
+        return alarm.comment != null ? alarm.comment.getId() : null;
     }
 }

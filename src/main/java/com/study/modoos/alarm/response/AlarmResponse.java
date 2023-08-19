@@ -27,7 +27,7 @@ public class AlarmResponse {
         response.studyName = alarm.getStudy().getTitle();
         response.studyId = alarm.getStudy().getId();
         response.content = alarm.getContent();
-        response.commentId = alarm.getComment().getId();
+        response.commentId = alarm.getCommentId(alarm);
         response.alarmType = alarm.getAlarmType();
         response.isRead = alarm.isRead();
         return response;

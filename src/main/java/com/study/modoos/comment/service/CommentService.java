@@ -54,12 +54,12 @@ public class CommentService {
 
         //답댓글인 경우
         if (commentRequest.getParentId() != null){
-            Alarm alarm = new Alarm(comment.getParent().getWriter(), recruit, comment, String.format("%s 가 %s 스터디의 회원님의 댓글에 대댓글을 작성하였습니다.",currentUser.getNickname(),recruit.getTitle()), AlarmType.REPLY_OF_MY_COMMENT);
+            Alarm alarm = new Alarm(comment.getParent().getWriter(), recruit, comment, String.format("%s 이(가) %s 스터디의 회원님의 댓글에 대댓글을 작성하였습니다.",currentUser.getNickname(),recruit.getTitle()), AlarmType.REPLY_OF_MY_COMMENT);
             alarmRepository.save(alarm);
         }
         //댓글인 경우
         else{
-            Alarm alarm = new Alarm(recruit.getLeader(), recruit, comment, String.format("%s 가 회원님의 %s 스터디에 댓글을 작성하였습니다.",currentUser.getNickname(), recruit.getTitle()), AlarmType.MY_STUDY_COMMENT);
+            Alarm alarm = new Alarm(recruit.getLeader(), recruit, comment, String.format("%s 이(가) 회원님의 %s 스터디에 댓글을 작성하였습니다.",currentUser.getNickname(), recruit.getTitle()), AlarmType.MY_STUDY_COMMENT);
             alarmRepository.save(alarm);
         }
     }
