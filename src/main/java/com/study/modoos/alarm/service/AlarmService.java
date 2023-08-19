@@ -3,6 +3,7 @@ package com.study.modoos.alarm.service;
 import com.study.modoos.alarm.entity.Alarm;
 import com.study.modoos.alarm.repository.AlarmRepository;
 import com.study.modoos.alarm.response.AlarmResponse;
+import com.study.modoos.alarm.response.ReadAlarmResponse;
 import com.study.modoos.common.exception.ErrorCode;
 import com.study.modoos.common.exception.ModoosException;
 import com.study.modoos.member.entity.Member;
@@ -36,5 +37,14 @@ public class AlarmService {
 
         return new SliceImpl<>(alarmResponses, sortedPageable, alarmSlice.hasNext());
 
+    }
+
+    public ReadAlarmResponse readAlarm(Member currentUser, Long alarmId) {
+        Member member = memberRepository.findByEmail(currentUser.getEmail())
+                .orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_FOUND));
+
+        Alarm requestAlarm = alarmRepository.findById(alarmId)
+                .orElseThrow(() -> new ModoosException(ErrorCode.ALARM_NOT_FOUND));
+        return ReadAlarmResponse.of(requestAlarm);
     }
 }

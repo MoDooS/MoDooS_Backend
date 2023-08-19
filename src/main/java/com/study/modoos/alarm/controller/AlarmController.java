@@ -1,6 +1,7 @@
 package com.study.modoos.alarm.controller;
 
 import com.study.modoos.alarm.response.AlarmResponse;
+import com.study.modoos.alarm.response.ReadAlarmResponse;
 import com.study.modoos.alarm.service.AlarmService;
 import com.study.modoos.common.CurrentUser;
 import com.study.modoos.member.entity.Member;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,5 +28,10 @@ public class AlarmController {
     public ResponseEntity<Slice<AlarmResponse>> getComment(@CurrentUser Member currentUser,
                                                            @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable){
         return  ResponseEntity.ok(alarmService.getAlarm(currentUser, pageable));
+    }
+
+    @GetMapping("/read/{alarmId}")
+    public ResponseEntity<ReadAlarmResponse> readAlarm(@CurrentUser Member currentUser, @PathVariable Long alarmId) {
+        return ResponseEntity.ok(alarmService.readAlarm(currentUser, alarmId));
     }
 }
