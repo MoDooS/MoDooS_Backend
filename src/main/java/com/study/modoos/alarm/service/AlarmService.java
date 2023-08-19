@@ -45,6 +45,6 @@ public class AlarmService {
 
         Alarm requestAlarm = alarmRepository.findById(alarmId)
                 .orElseThrow(() -> new ModoosException(ErrorCode.ALARM_NOT_FOUND));
-        return ReadAlarmResponse.of(requestAlarm);
+        return ReadAlarmResponse.readAlarm(requestAlarm, true);
     }
 }

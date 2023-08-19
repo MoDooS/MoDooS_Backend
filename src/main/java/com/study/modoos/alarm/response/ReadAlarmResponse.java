@@ -11,10 +11,10 @@ public class ReadAlarmResponse {
     Long alarmId;
     boolean isRead;
 
-    public static ReadAlarmResponse of(Alarm alarm) {
+    public static ReadAlarmResponse readAlarm(Alarm alarm, boolean isRead) {
         return ReadAlarmResponse.builder()
                 .alarmId(alarm.getId())
-                .isRead(alarm.isRead())
+                .isRead(isRead)
                 .build();
     }
 }
