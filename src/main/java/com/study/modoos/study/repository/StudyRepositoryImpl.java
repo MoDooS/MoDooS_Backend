@@ -14,6 +14,7 @@ import com.study.modoos.participant.entity.Participant;
 import com.study.modoos.recruit.response.RecruitListInfoResponse;
 import com.study.modoos.study.entity.Category;
 import com.study.modoos.study.entity.Study;
+import com.study.modoos.study.entity.StudyStatus;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,11 +36,38 @@ import static com.study.modoos.study.entity.QStudy.study;
 public class StudyRepositoryImpl {
     private final JPAQueryFactory queryFactory;
 
+    //no-offset 방식 처리
+    private BooleanExpression ltStudyId(@Nullable Long studyId, Study lastStudy, String sortBy) {
+        BooleanExpression condition = null;
+
+        if (studyId == null) {
+            return null;
+        }
+
+        if (sortBy.equals("createdAt")) {
+            condition = study.createdAt.lt(lastStudy.getCreatedAt())
+                    .or(study.createdAt.eq(lastStudy.getCreatedAt())
+                            .and(study.id.gt(lastStudy.getId()))
+                    );
+        } else if (sortBy.equals("recruit_deadline")) {
+            condition = study.recruit_deadline.gt(lastStudy.getRecruit_deadline())
+                    .or(study.recruit_deadline.eq(lastStudy.getRecruit_deadline())
+                            .and(study.id.gt(lastStudy.getId())));
+        } else if (sortBy.equals("heart")) {
+            condition = study.heart.lt(lastStudy.getHeart())
+                    .or(study.heart.eq(lastStudy.getHeart())
+                            .and(study.id.gt(lastStudy.getId()))
+                    );
+        }
+        return condition;
+    }
 
     public Slice<RecruitListInfoResponse> getSliceOfRecruit(Member member,
                                                             final String title,
                                                             final List<Category> categoryList,
                                                             final Long lastId,
+                                                            Study lastStudy,
+                                                            String sortBy,
                                                             Pageable pageable) {
         /*
         if (order.equals("likeCount")) {
@@ -50,20 +79,28 @@ public class StudyRepositoryImpl {
 
         }
         */
+
+        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
+
+        if (sortBy.equals("createdAt")) {
+            orderSpecifiers.add(study.createdAt.desc());
+        } else if (sortBy.equals("recruit_deadline")) {
+            orderSpecifiers.add(study.recruit_deadline.asc());
+            orderSpecifiers.add(study.id.asc());
+        } else if (sortBy.equals("heart")) {
+            orderSpecifiers.add(study.heart.desc());
+            orderSpecifiers.add(study.id.asc());
+        }
+
         JPAQuery<Study> results = queryFactory.selectFrom(study)
                 .where(
                         titleLike(title),
                         categoryEq(categoryList),
-                        ltStudyId(lastId))
+                        ltStudyId(lastId, lastStudy, sortBy))
                 //.orderBy(study.createdAt.desc())
+                .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1);
-
-        for (Sort.Order o : pageable.getSort()) {
-            PathBuilder pathBuilder = new PathBuilder(study.getType(), study.getMetadata());
-            results.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC :
-                    Order.DESC, pathBuilder.get(o.getProperty())));
-        }
 
         List<RecruitListInfoResponse> contents = results.fetch()
                 .stream()
@@ -88,12 +125,6 @@ public class StudyRepositoryImpl {
                 .fetchFirst();
     }
 
-    //no-offset 방식 처리
-    private BooleanExpression ltStudyId(@Nullable Long studyId) {
-        return studyId == null ? null : study.id.lt(studyId);
-    }
-
-
     //제목 검색어로 검색
     private BooleanExpression titleLike(final String title) {
         return StringUtils.hasText(title) ? study.title.contains(title) : null;
@@ -112,19 +143,22 @@ public class StudyRepositoryImpl {
         return booleanBuilder;
     }
 
-    public Slice<RecruitListInfoResponse> getMyStudyList(Member member, String status, Pageable pageable) {
+    public Slice<RecruitListInfoResponse> getMyStudyList(Member member, StudyStatus status, Pageable pageable) {
         JPAQuery<Participant> results = queryFactory.selectFrom(participant)
                 .join(participant.study, study)
                 .where(participant.member.eq(member))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1);
 
-        if ("모집중".equals(status)) {
-            results.where(study.status.eq(0)); // 0: 모집중 상태
-        } else if ("모집완료".equals(status)) {
-            results.where(study.status.eq(1)); // 1: 모집완료 상태
-        } else if ("생성완료".equals(status)) {
-            results.where(study.status.eq(2)); // 2: 스터디 생성 완료 상태
+        if (status.equals(StudyStatus.RECRUITING) || status.equals(StudyStatus.RECRUIT_END)) {
+            results.where(
+                    study.status.eq(StudyStatus.RECRUITING).or(study.status.eq(StudyStatus.RECRUIT_END))
+            );
+            // 0: 모집중 상태
+        } else if (status.equals(StudyStatus.ONGOING)) {
+            results.where(study.status.eq(StudyStatus.ONGOING)); // 진행 중 상태
+        } else if (status.equals(StudyStatus.STUDY_END)) {
+            results.where(study.status.eq(StudyStatus.STUDY_END)); // 2: 스터디 생성 완료 상태
         } else {
             throw new ModoosException(ErrorCode.STUDY_STATUS);
         }
@@ -135,10 +169,12 @@ public class StudyRepositoryImpl {
                     Order.DESC, pathBuilder.get(o.getProperty())));
         }
 
+
         List<RecruitListInfoResponse> contents = results.fetch()
                 .stream()
                 .map(o -> RecruitListInfoResponse.of(o.getStudy()))
                 .collect(Collectors.toList());
+
 
         boolean hasNext = false;
 

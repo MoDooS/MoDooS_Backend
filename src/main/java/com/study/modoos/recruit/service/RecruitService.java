@@ -15,6 +15,7 @@ import com.study.modoos.recruit.response.RecruitListInfoResponse;
 import com.study.modoos.recruit.response.TodoResponse;
 import com.study.modoos.study.entity.Category;
 import com.study.modoos.study.entity.Study;
+import com.study.modoos.study.entity.StudyStatus;
 import com.study.modoos.study.entity.Todo;
 import com.study.modoos.study.repository.StudyRepository;
 import com.study.modoos.study.repository.StudyRepositoryImpl;
@@ -47,12 +48,15 @@ public class RecruitService {
         Study study = request.createRecruit(currentMember);
         studyRepository.save(study);
 
-        for (String todo : todos) {
-            Todo t = Todo.builder().
-                    study(study)
-                    .content(todo)
-                    .build();
-            todoRepository.save(t);
+        if (todos != null) {
+
+            for (String todo : todos) {
+                Todo t = Todo.builder().
+                        study(study)
+                        .content(todo)
+                        .build();
+                todoRepository.save(t);
+            }
         }
 
         studyRepository.save(study);
@@ -88,14 +92,23 @@ public class RecruitService {
         return RecruitInfoResponse.of(study, false, checkList, participantResponseList);
     }
 
-    public Slice<RecruitListInfoResponse> getRecruitList(Member member, String search, List<String> categoryList, Long lastId, Pageable pageable) {
+    public Slice<RecruitListInfoResponse> getRecruitList(Member member, String search, List<String> categoryList, Long lastId, String sortBy, Pageable pageable) {
 
         List<Category> categories = new ArrayList<>();
 
         for (String s : categoryList) {
             categories.add(Category.resolve(s));
         }
-        return studyRepositoryImpl.getSliceOfRecruit(member, search, categories, lastId, pageable);
+
+        Study lastStudy;
+
+        if (lastId == null) {
+            lastStudy = null;
+        } else {
+            lastStudy = studyRepository.findById(lastId)
+                    .orElse(null);
+        }
+        return studyRepositoryImpl.getSliceOfRecruit(member, search, categories, lastId, lastStudy, sortBy, pageable);
     }
 
     @Transactional
@@ -107,7 +120,7 @@ public class RecruitService {
         }
 
         //스터디가 이미 생성된 모집공고면 삭제 불가능
-        if (study.getStatus() == 2) {
+        if (study.getStatus() == StudyStatus.ONGOING) {
             throw new ModoosException(ErrorCode.STUDY_NOT_EDIT);
         }
 
@@ -156,7 +169,7 @@ public class RecruitService {
         }
 
         //스터디가 이미 생성된 모집공고면 삭제 불가능
-        if (study.getStatus() == 2) {
+        if (study.getStatus() == StudyStatus.ONGOING) {
             throw new ModoosException(ErrorCode.STUDY_NOT_EDIT);
         }
 
@@ -171,7 +184,7 @@ public class RecruitService {
     }
 
     @Transactional
-    public Slice<RecruitListInfoResponse> getMyStudyList(Member member, String status,Pageable pageable) {
+    public Slice<RecruitListInfoResponse> getMyStudyList(Member member, StudyStatus status, Pageable pageable) {
         return studyRepositoryImpl.getMyStudyList(member, status, pageable);
     }
 }

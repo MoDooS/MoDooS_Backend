@@ -1,5 +1,8 @@
 package com.study.modoos.participant.service;
 
+import com.study.modoos.alarm.entity.Alarm;
+import com.study.modoos.alarm.entity.AlarmType;
+import com.study.modoos.alarm.repository.AlarmRepository;
 import com.study.modoos.common.exception.ErrorCode;
 import com.study.modoos.common.exception.ModoosException;
 import com.study.modoos.member.entity.Member;
@@ -32,6 +35,7 @@ public class ParticipantService {
     private final MemberRepository memberRepository;
     private final StudyRepository studyRepository;
     private final StandbyRepositoryImpl standbyRepositoryImpl;
+    private final AlarmRepository alarmRepository;
 
     public Slice<AllApplicationResponse> getAllApply(Member member, Pageable page) {
         return standbyRepositoryImpl.getSliceOfAllApplication(member, page);
@@ -64,6 +68,10 @@ public class ParticipantService {
         Standby standby = new Standby(currentUser, study);
         standbyRepository.save(standby);
         Standby standby_waiter = standbyRepository.findByMemberAndStudy(currentUser, study);
+
+        Alarm alarm = new Alarm(study.getLeader(), study, null, String.format("%s 이(가) %s 스터디를 신청하였습니다.",currentUser.getNickname(),study.getTitle()), AlarmType.STUDY_CONFRIM);
+        alarmRepository.save(alarm);
+
         return StandbyResponse.of(standby_waiter);
     }
 
@@ -87,6 +95,9 @@ public class ParticipantService {
 
         standbyRepository.delete(standby);
 
+        Alarm alarm = new Alarm(currentUser, study, null, String.format("%s 스터디 신청이 수락되었습니다.",study.getTitle()), AlarmType.STUDY_ACCEPT);
+        alarmRepository.save(alarm);
+
         return ParticipantResponse.of(participant_confirm);
     }
 
@@ -100,6 +111,9 @@ public class ParticipantService {
         if (!study.getLeader().equals(currentUser)) {
             throw new ModoosException(ErrorCode.FORBIDDEN_STUDY_ACCEPT);
         }
+
+        Alarm alarm = new Alarm(currentUser, study, null, String.format("%s 스터디 신청이 거절되었습니다.",study.getTitle()), AlarmType.STUDY_REJECT);
+        alarmRepository.save(alarm);
 
         standbyRepository.delete(standby);
     }

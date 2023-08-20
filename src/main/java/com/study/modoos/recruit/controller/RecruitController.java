@@ -9,6 +9,7 @@ import com.study.modoos.recruit.response.RecruitIdResponse;
 import com.study.modoos.recruit.response.RecruitInfoResponse;
 import com.study.modoos.recruit.response.RecruitListInfoResponse;
 import com.study.modoos.recruit.service.RecruitService;
+import com.study.modoos.study.entity.StudyStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -42,9 +43,11 @@ public class RecruitController {
                                                                          @RequestParam(value = "category", defaultValue = "") List<String> category,
                                                                          @RequestParam(value = "searchBy", required = false) String search,
                                                                          @RequestParam(value = "lastId", required = false) Long lastId,
+                                                                         @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
                                                                          @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable) {
 
-        return ResponseEntity.ok(recruitService.getRecruitList(member, search, category, lastId, pageable));
+
+        return ResponseEntity.ok(recruitService.getRecruitList(member, search, category, lastId, sortBy, pageable));
 
     }
 
@@ -60,8 +63,8 @@ public class RecruitController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<Slice<RecruitListInfoResponse>> getMyStudyList(@CurrentUser Member member,  @RequestParam(required = false) String status,
-                                                                     @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable) {
+    public ResponseEntity<Slice<RecruitListInfoResponse>> getMyStudyList(@CurrentUser Member member, @RequestParam(required = false) StudyStatus status,
+                                                                         @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable) {
         return ResponseEntity.ok(recruitService.getMyStudyList(member, status, pageable));
     }
 }

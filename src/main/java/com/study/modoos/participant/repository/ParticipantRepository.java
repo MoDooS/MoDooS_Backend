@@ -10,7 +10,12 @@ import java.util.Optional;
 
 public interface ParticipantRepository extends JpaRepository<Participant, Long> {
     boolean existsByStudyAndMember(Study study, Member currentUser);
+
     int countByStudy(Study study);
+
     Optional<Participant> findByMemberAndStudy(Member member, Study study);
+
     List<Participant> findByStudy(Study study);
+
+    List<Participant> findByMember(Member member);
 }

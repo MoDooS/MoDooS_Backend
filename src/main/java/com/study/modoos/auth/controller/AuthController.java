@@ -33,21 +33,10 @@ public class AuthController {
         // User 등록 및 Refresh Token 저장
         LoginResponse loginResponse = authService.login(loginRequest);
 
-        ResponseCookie accessTokenCookie = ResponseCookie.from("access-token", loginResponse.getAccessToken())
-                .path("/")
-                .domain("localhost")
-                .sameSite("None")
-                .httpOnly(true)
-                .secure(true)
-                .maxAge(COOKIE_EXPIRATION)
-                .build();
-
-        response.addHeader("Set-Cookie", accessTokenCookie.toString());
-
-
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh-token", loginResponse.getRefreshToken())
                 .path("/")
-                .domain("localhost")
+                .domain("modoos.vercel.app")
+                .domain(".localhost")
                 .sameSite("None")
                 .httpOnly(true)
                 .secure(true)
@@ -56,8 +45,7 @@ public class AuthController {
 
         response.addHeader("Set-Cookie", refreshTokenCookie.toString());
 
-        return ResponseEntity.ok()
-                .build();
+        return ResponseEntity.ok( new LoginResponse(loginResponse.getTokenType(), loginResponse.getAccessToken()));
     }
 
 
@@ -81,7 +69,9 @@ public class AuthController {
             // RT 저장
             ResponseCookie responseCookie = ResponseCookie.from("refresh-token", reissuedTokenDto.getRefreshToken())
                     .maxAge(COOKIE_EXPIRATION)
-                    .httpOnly(true)
+                    .domain("localhost")
+                    .sameSite("None")
+                    .httpOnly(false)
                     .secure(true)
                     .build();
             return ResponseEntity
@@ -110,6 +100,7 @@ public class AuthController {
         authService.logout(requestAccessToken);
         ResponseCookie responseCookie = ResponseCookie.from("refresh-token", "")
                 .maxAge(0)
+                .domain("localhost")
                 .path("/")
                 .build();
 

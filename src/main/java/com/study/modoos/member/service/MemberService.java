@@ -2,26 +2,33 @@ package com.study.modoos.member.service;
 
 import com.study.modoos.common.exception.ErrorCode;
 import com.study.modoos.common.exception.ModoosException;
+import com.study.modoos.heart.service.HeartService;
 import com.study.modoos.member.entity.Campus;
 import com.study.modoos.member.entity.Department;
 import com.study.modoos.member.entity.Member;
 import com.study.modoos.member.repository.MemberRepository;
 import com.study.modoos.member.request.ChangeMemberInfoRequest;
-import com.study.modoos.member.response.MemberInfoResponse;
+import com.study.modoos.member.response.MemberProfileResponse;
+import com.study.modoos.member.response.MyInfoResponse;
+import com.study.modoos.study.entity.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
 
-    public MemberInfoResponse getMemberInfo(Member currentMember) {
-        if (currentMember == null){
+    private final HeartService heartService;
+
+    public MyInfoResponse getMyInfo(Member currentMember) {
+        if (currentMember == null) {
             throw new ModoosException(ErrorCode.INVALID_TOKEN);
         }
         return memberRepository.findById(currentMember.getId())
-                .map(MemberInfoResponse::of)
+                .map(MyInfoResponse::of)
                 .orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
@@ -42,6 +49,30 @@ public class MemberService {
             throw new ModoosException(ErrorCode.ALREADY_MEMBER);
         }
         memberRepository.save(member);
+    }
+
+    //랭킹, 점수, 스터디 태그, 스터디 개수, 자기자신 여부 넘겨주기(프로필)
+    public MemberProfileResponse getMemberProfile(Member currentMember, Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_FOUND));
+
+        //기본정보와 랭킹, 점수
+        Long id = member.getId();
+        String nickname = member.getNickname();
+        String ranking = member.getRanking();
+        Long score = member.getScore();
+
+        //관심있게 보는 스터디 태그
+        List<Category> categoryList = heartService.findMostCommonCategoryForMember(member);
+
+        //사용자가 관심있게 본 스터디 개수
+        int heartCount = heartService.countHeartStudy(member);
+
+        boolean isSelf = member.getId().equals(currentMember.getId()) ? true : false;
+
+        return MemberProfileResponse.of(member, categoryList, heartCount, isSelf);
+
+
     }
 
     public boolean nicknameCheck(String nickname) {
