@@ -34,7 +34,9 @@ public enum ErrorCode {
     MEMBER_IS_ABSENT(HttpStatus.FORBIDDEN, "결석한 참여자는 평가할 수 없습니다.", "이번 회차 출결을 확인해주세요."),
     UNABLE_TO_START_ON_THE_DAY(HttpStatus.FORBIDDEN, "스터디 시작일은 당잉이 될 수 없습니다.", "스터디 시작일을 변경해주세요."),
     ALREADY_FEEDBACK(HttpStatus.CONFLICT, "이미 평가하였습니다.", "평가 주차와 이전 평가 여부를 다시 한 번 확인해주세요."),
-    INVALID_COOKIE_NAME(HttpStatus.NOT_FOUND, "JwtFilter > resolveToken 에서 쿠키 이름이 다릅니다", "cookie.getName()으로 쿠키 이름을 확인해주세요");
+    INVALID_COOKIE_NAME(HttpStatus.NOT_FOUND, "JwtFilter > resolveToken 에서 쿠키 이름이 다릅니다", "cookie.getName()으로 쿠키 이름을 확인해주세요"),
+    MEMBER_NOT_IN_ALARM(HttpStatus.NOT_FOUND, "해당 수신자에 대한 알림 데이터가 없습니다." , "알림이 생기면 확인해주세요"),
+    ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 알람을 찾을 수 없습니다.", "alarmId를 확인해주세요");
 
 
     private final HttpStatus httpStatus;
