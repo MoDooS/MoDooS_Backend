@@ -13,7 +13,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MyFeedbackResponse {
+public class MemberFeedbackResponse {
+
+    private boolean isSelf;
+
+    private Long id;
+
+    private String nickname;
 
     private List<PositiveKeywordResponse> positiveList;
 

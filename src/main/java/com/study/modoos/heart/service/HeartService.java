@@ -9,12 +9,20 @@ import com.study.modoos.heart.response.HeartClickResponse;
 import com.study.modoos.heart.response.HeartResponse;
 import com.study.modoos.member.entity.Member;
 import com.study.modoos.member.repository.MemberRepository;
+import com.study.modoos.study.entity.Category;
 import com.study.modoos.study.entity.Study;
 import com.study.modoos.study.repository.StudyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -49,5 +57,40 @@ public class HeartService {
         }
         studyRepository.save(study);
         return HeartClickResponse.of(member, study, existingHeart == null);
+    }
+
+    public List<Category> findMostCommonCategoryForMember(Member member) {
+        // 특정 멤버가 누른 Heart 엔티티들 조회
+        List<Heart> hearts = heartRepository.findByMember(member);
+
+        // Heart 엔티티들에 연결된 Study 엔티티들의 Category 정보 수집
+        List<Category> categories = hearts.stream()
+                .map(Heart::getStudy)
+                .map(Study::getCategory)
+                .collect(Collectors.toList());
+
+        // 가장 많이 공통되는 Category 찾기
+        Map<Category, Long> categoryCountMap = categories.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        List<Map.Entry<Category, Long>> maxEntries = categoryCountMap.entrySet().stream()
+                .collect(Collectors.groupingBy(Map.Entry::getValue))
+                .entrySet().stream()
+                .max(Comparator.comparing(Map.Entry::getKey))
+                .map(Map.Entry::getValue)
+                .orElse(Collections.emptyList());
+
+        List<Category> mostCommonCategories = maxEntries.stream()
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        return mostCommonCategories;
+    }
+
+    public int countHeartStudy(Member member) {
+        // 특정 멤버가 누른 Heart 엔티티들 조회
+        List<Heart> hearts = heartRepository.findByMember(member);
+
+        return hearts.size();
     }
 }
