@@ -20,6 +20,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -47,6 +49,9 @@ public class ParticipantService {
         boolean isParticipant = participantRepository.existsByStudyAndMember(study, currentUser);
         boolean isStandby = standbyRepository.existsByStudyAndMember(study, currentUser);
 
+        if(study.getRecruit_deadline().isBefore(LocalDate.now())){
+            throw new ModoosException(ErrorCode.MISS_DEADLINE);
+        }
         if (isParticipant) {
             throw new ModoosException(ErrorCode.ALREADY_PARTICIPANT);
         }
