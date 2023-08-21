@@ -22,6 +22,8 @@ public class StudyInfoResponse {
 
     private Long memberId;
 
+    private boolean isLeader;
+
     private String title;
 
     private String description;
@@ -51,10 +53,11 @@ public class StudyInfoResponse {
 
     private List<StudyParticipantResponse> participantList; //전체 회원의 출석상태, 아웃, 정보 ㅔ
 
-    public static StudyInfoResponse of(Study study, Member member, List<TodoResponse> checkList, FeedbackResponse feedback, List<StudyParticipantResponse> participantList) {
+    public static StudyInfoResponse of(Study study, boolean isLeader, Member member, List<TodoResponse> checkList, FeedbackResponse feedback, List<StudyParticipantResponse> participantList) {
         return StudyInfoResponse.builder()
                 .id(study.getId())
                 .memberId(member.getId())
+                .isLeader(isLeader)
                 .title(study.getTitle())
                 .description(study.getDescription())
                 .participants_count(study.getParticipants_count())
