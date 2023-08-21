@@ -132,26 +132,35 @@ public class RecruitService {
 
         //체크리스트 확인해서 update
         List<TodoRequest> checkList = request.getCheckList();
-        Todo todo;
+
+        List<Todo> todoList = todoRepository.findTodoByStudy(study);
+
+        //스터디에 연결된 todoList 확인
+        for (Todo todo : todoList) {
+            boolean flag = false;
+
+            for (TodoRequest todoRequest : checkList) {
+                if (todoRequest.getId() != null && todo.getId().equals(todoRequest.getId())) {
+                    todo.setContent(todoRequest.getContent());
+                    flag = true;
+                    todoRepository.save(todo);
+                    break;
+                }
+            }
+
+            //해당하는 값 없으면 삭제
+            if (!flag) {
+                todoRepository.delete(todo);
+            }
+        }
 
         for (TodoRequest todoRequest : checkList) {
-            if (todoRequest.getRequestType().equals("없음"))
-                continue;
-
-            if (todoRequest.getRequestType().equals("추가")) {
-                todo = todoRequest.createTodo(study);
+            if (todoRequest.getId() == null) {
+                Todo todo = Todo.builder()
+                        .study(study)
+                        .content(todoRequest.getContent())
+                        .build();
                 todoRepository.save(todo);
-            } else if (todoRequest.getRequestType().equals("수정")) {
-                todo = todoRepository.findById(todoRequest.getId())
-                        .orElseThrow(() -> new ModoosException(ErrorCode.TODO_NOT_FOUND));
-                todo.setContent(todoRequest.getContent());
-                todoRepository.save(todo);
-            } else if (todoRequest.getRequestType().equals("삭제")) {
-                todo = todoRepository.findById(todoRequest.getId())
-                        .orElseThrow(() -> new ModoosException(ErrorCode.TODO_NOT_FOUND));
-                todoRepository.delete(todo);
-            } else {
-                throw new ModoosException(ErrorCode.VALUE_NOT_IN_OPTION);
             }
         }
 
