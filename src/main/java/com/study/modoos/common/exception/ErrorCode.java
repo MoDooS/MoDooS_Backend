@@ -32,7 +32,7 @@ public enum ErrorCode {
     RECEIVER_NOT_IN_STUDY(HttpStatus.FORBIDDEN, "평가 회원이 해당 스터디에 참여 인원이 아닙니다.", "스터디에 참여중인지 확인해주세요"),
     NOT_EVALUATION_PERIOD(HttpStatus.FORBIDDEN, "평기 기간이 아닙니다.", "평가기간을 다시 한 번 확인해주세요."),
     MEMBER_IS_ABSENT(HttpStatus.FORBIDDEN, "결석한 참여자는 평가할 수 없습니다.", "이번 회차 출결을 확인해주세요."),
-    UNABLE_TO_START_ON_THE_DAY(HttpStatus.FORBIDDEN, "스터디 시작일은 당잉이 될 수 없습니다.", "스터디 시작일을 변경해주세요."),
+    UNABLE_TO_START_ON_THE_DAY(HttpStatus.FORBIDDEN, "스터디 시작일은 당일이 될 수 없습니다.", "스터디 시작일을 변경해주세요."),
     ALREADY_FEEDBACK(HttpStatus.CONFLICT, "이미 평가하였습니다.", "평가 주차와 이전 평가 여부를 다시 한 번 확인해주세요."),
     INVALID_COOKIE_NAME(HttpStatus.NOT_FOUND, "JwtFilter > resolveToken 에서 쿠키 이름이 다릅니다", "cookie.getName()으로 쿠키 이름을 확인해주세요"),
     MISS_DEADLINE(HttpStatus.FORBIDDEN, "해당 스터디의 모집 마감일이 지났습니다.", "해당 스터디는 모집이 종료되었습니다." ),
