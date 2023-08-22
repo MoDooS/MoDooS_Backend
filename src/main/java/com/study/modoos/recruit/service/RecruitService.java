@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -89,10 +90,16 @@ public class RecruitService {
             participantResponseList.add(StudyParticipantResponse.of(participant, null));
         }
 
+        Optional<Heart> heart = heartRepository.findByMemberAndStudy(currentMember, study);
+        boolean isHeart = false;
+
+        if (heart.isPresent())
+            isHeart = true;
+
         if (currentMember != null && study.getLeader().getId().equals(currentMember.getId())) {
-            return RecruitInfoResponse.of(study, true, checkList, participantResponseList);
+            return RecruitInfoResponse.of(study, true, checkList, participantResponseList, isHeart);
         }
-        return RecruitInfoResponse.of(study, false, checkList, participantResponseList);
+        return RecruitInfoResponse.of(study, false, checkList, participantResponseList, isHeart);
     }
 
     public Slice<RecruitListInfoResponse> getRecruitList(Member member, String search, List<String> categoryList, Long lastId, String sortBy, Pageable pageable) {

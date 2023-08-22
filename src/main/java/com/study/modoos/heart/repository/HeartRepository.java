@@ -9,11 +9,10 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
-
-import java.util.List;
+import java.util.Optional;
 
 public interface HeartRepository extends JpaRepository<Heart, Long> {
-    Heart findByMemberAndStudy(Member currentUser, Study study);
+    Optional<Heart> findByMemberAndStudy(Member currentUser, Study study);
 
 
     @Query("SELECT h.study FROM Heart h WHERE h.study.status = 'RECRUITING' AND h.study.recruit_deadline = ?1")
