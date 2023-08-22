@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class AllApplicationResponse {
+    Long standbyId;
     Long memberId;
     String nickName;
     Long studyId;
@@ -18,6 +19,7 @@ public class AllApplicationResponse {
 
     public static AllApplicationResponse of(Standby standby){
         return AllApplicationResponse.builder()
+                .standbyId(standby.getId())
                 .memberId(standby.getMember().getId())
                 .nickName(standby.getMember().getNickname())
                 .studyId(standby.getStudy().getId())
