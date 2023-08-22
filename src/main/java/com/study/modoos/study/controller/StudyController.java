@@ -43,7 +43,7 @@ public class StudyController {
         return ResponseEntity.ok(studyService.beforeFeedback(member, id, turn));
     }
 
-    @PostMapping("/feedback/{id}")
+    @PostMapping("/feedback")
     public ResponseEntity<RecruitIdResponse> createFeedback(@CurrentUser Member member, @RequestBody CreateAllFeedbackRequest request) {
         return ResponseEntity.ok(studyService.createFeedback(member, request));
     }

@@ -3,6 +3,8 @@ package com.study.modoos.recruit.service;
 import com.study.modoos.common.exception.ErrorCode;
 import com.study.modoos.common.exception.ModoosException;
 import com.study.modoos.common.service.EntityFinder;
+import com.study.modoos.heart.entity.Heart;
+import com.study.modoos.heart.repository.HeartRepository;
 import com.study.modoos.member.entity.Member;
 import com.study.modoos.participant.entity.Participant;
 import com.study.modoos.participant.repository.ParticipantRepository;
@@ -29,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +43,7 @@ public class RecruitService {
     private final EntityFinder entityFinder;
     private final TodoRepository todoRepository;
     private final ParticipantRepository participantRepostiory;
+    private final HeartRepository heartRepository;
 
     @Transactional
     public RecruitIdResponse postRecruit(Member currentMember, RecruitRequest request) {
@@ -86,10 +90,16 @@ public class RecruitService {
             participantResponseList.add(StudyParticipantResponse.of(participant, null));
         }
 
+        Optional<Heart> heart = heartRepository.findByMemberAndStudy(currentMember, study);
+        boolean isHeart = false;
+
+        if (heart.isPresent())
+            isHeart = true;
+
         if (currentMember != null && study.getLeader().getId().equals(currentMember.getId())) {
-            return RecruitInfoResponse.of(study, true, checkList, participantResponseList);
+            return RecruitInfoResponse.of(study, true, checkList, participantResponseList, isHeart);
         }
-        return RecruitInfoResponse.of(study, false, checkList, participantResponseList);
+        return RecruitInfoResponse.of(study, false, checkList, participantResponseList, isHeart);
     }
 
     public Slice<RecruitListInfoResponse> getRecruitList(Member member, String search, List<String> categoryList, Long lastId, String sortBy, Pageable pageable) {
@@ -108,7 +118,9 @@ public class RecruitService {
             lastStudy = studyRepository.findById(lastId)
                     .orElse(null);
         }
-        return studyRepositoryImpl.getSliceOfRecruit(member, search, categories, lastId, lastStudy, sortBy, pageable);
+
+        List<Heart> hearts = heartRepository.findByMember(member);
+        return studyRepositoryImpl.getSliceOfRecruit(member, search, categories, lastId, lastStudy, sortBy, hearts, pageable);
     }
 
     @Transactional
@@ -132,26 +144,35 @@ public class RecruitService {
 
         //체크리스트 확인해서 update
         List<TodoRequest> checkList = request.getCheckList();
-        Todo todo;
+
+        List<Todo> todoList = todoRepository.findTodoByStudy(study);
+
+        //스터디에 연결된 todoList 확인
+        for (Todo todo : todoList) {
+            boolean flag = false;
+
+            for (TodoRequest todoRequest : checkList) {
+                if (todoRequest.getId() != null && todo.getId().equals(todoRequest.getId())) {
+                    todo.setContent(todoRequest.getContent());
+                    flag = true;
+                    todoRepository.save(todo);
+                    break;
+                }
+            }
+
+            //해당하는 값 없으면 삭제
+            if (!flag) {
+                todoRepository.delete(todo);
+            }
+        }
 
         for (TodoRequest todoRequest : checkList) {
-            if (todoRequest.getRequestType().equals("없음"))
-                continue;
-
-            if (todoRequest.getRequestType().equals("추가")) {
-                todo = todoRequest.createTodo(study);
+            if (todoRequest.getId() == null) {
+                Todo todo = Todo.builder()
+                        .study(study)
+                        .content(todoRequest.getContent())
+                        .build();
                 todoRepository.save(todo);
-            } else if (todoRequest.getRequestType().equals("수정")) {
-                todo = todoRepository.findById(todoRequest.getId())
-                        .orElseThrow(() -> new ModoosException(ErrorCode.TODO_NOT_FOUND));
-                todo.setContent(todoRequest.getContent());
-                todoRepository.save(todo);
-            } else if (todoRequest.getRequestType().equals("삭제")) {
-                todo = todoRepository.findById(todoRequest.getId())
-                        .orElseThrow(() -> new ModoosException(ErrorCode.TODO_NOT_FOUND));
-                todoRepository.delete(todo);
-            } else {
-                throw new ModoosException(ErrorCode.VALUE_NOT_IN_OPTION);
             }
         }
 
@@ -185,6 +206,12 @@ public class RecruitService {
 
     @Transactional
     public Slice<RecruitListInfoResponse> getMyStudyList(Member member, StudyStatus status, Pageable pageable) {
-        return studyRepositoryImpl.getMyStudyList(member, status, pageable);
+        List<Heart> hearts = heartRepository.findByMember(member);
+
+        if (hearts == null) hearts = new ArrayList<>();
+
+        List<Study> studies = hearts.stream().map(heart -> heart.getStudy())
+                .collect(Collectors.toList());
+        return studyRepositoryImpl.getMyStudyList(member, status, studies, pageable);
     }
 }

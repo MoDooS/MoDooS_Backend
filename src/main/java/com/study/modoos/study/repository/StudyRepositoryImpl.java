@@ -9,6 +9,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.study.modoos.common.exception.ErrorCode;
 import com.study.modoos.common.exception.ModoosException;
+import com.study.modoos.heart.entity.Heart;
 import com.study.modoos.member.entity.Member;
 import com.study.modoos.participant.entity.Participant;
 import com.study.modoos.recruit.response.RecruitListInfoResponse;
@@ -68,6 +69,7 @@ public class StudyRepositoryImpl {
                                                             final Long lastId,
                                                             Study lastStudy,
                                                             String sortBy,
+                                                            List<Heart> hearts,
                                                             Pageable pageable) {
         /*
         if (order.equals("likeCount")) {
@@ -102,9 +104,16 @@ public class StudyRepositoryImpl {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1);
 
+        if (hearts == null) {
+            hearts = new ArrayList<>();
+        }
+
+        List<Study> studies = hearts.stream().map(heart -> heart.getStudy())
+                .collect(Collectors.toList());
+
         List<RecruitListInfoResponse> contents = results.fetch()
                 .stream()
-                .map(o -> RecruitListInfoResponse.of(o))
+                .map(o -> RecruitListInfoResponse.of(o, studies.contains(o)))
                 .collect(Collectors.toList());
 
 
@@ -143,7 +152,7 @@ public class StudyRepositoryImpl {
         return booleanBuilder;
     }
 
-    public Slice<RecruitListInfoResponse> getMyStudyList(Member member, StudyStatus status, Pageable pageable) {
+    public Slice<RecruitListInfoResponse> getMyStudyList(Member member, StudyStatus status, List<Study> studies, Pageable pageable) {
         JPAQuery<Participant> results = queryFactory.selectFrom(participant)
                 .join(participant.study, study)
                 .where(participant.member.eq(member))
@@ -173,7 +182,7 @@ public class StudyRepositoryImpl {
 
         List<RecruitListInfoResponse> contents = results.fetch()
                 .stream()
-                .map(o -> RecruitListInfoResponse.of(o.getStudy()))
+                .map(o -> RecruitListInfoResponse.of(o.getStudy(), studies.contains(o.getStudy())))
                 .collect(Collectors.toList());
 
 
