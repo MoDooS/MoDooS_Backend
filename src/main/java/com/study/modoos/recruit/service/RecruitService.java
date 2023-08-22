@@ -3,6 +3,8 @@ package com.study.modoos.recruit.service;
 import com.study.modoos.common.exception.ErrorCode;
 import com.study.modoos.common.exception.ModoosException;
 import com.study.modoos.common.service.EntityFinder;
+import com.study.modoos.heart.entity.Heart;
+import com.study.modoos.heart.repository.HeartRepository;
 import com.study.modoos.member.entity.Member;
 import com.study.modoos.participant.entity.Participant;
 import com.study.modoos.participant.repository.ParticipantRepository;
@@ -40,6 +42,7 @@ public class RecruitService {
     private final EntityFinder entityFinder;
     private final TodoRepository todoRepository;
     private final ParticipantRepository participantRepostiory;
+    private final HeartRepository heartRepository;
 
     @Transactional
     public RecruitIdResponse postRecruit(Member currentMember, RecruitRequest request) {
@@ -108,7 +111,9 @@ public class RecruitService {
             lastStudy = studyRepository.findById(lastId)
                     .orElse(null);
         }
-        return studyRepositoryImpl.getSliceOfRecruit(member, search, categories, lastId, lastStudy, sortBy, pageable);
+
+        List<Heart> hearts = heartRepository.findByMember(member);
+        return studyRepositoryImpl.getSliceOfRecruit(member, search, categories, lastId, lastStudy, sortBy, hearts, pageable);
     }
 
     @Transactional
@@ -185,6 +190,12 @@ public class RecruitService {
 
     @Transactional
     public Slice<RecruitListInfoResponse> getMyStudyList(Member member, StudyStatus status, Pageable pageable) {
-        return studyRepositoryImpl.getMyStudyList(member, status, pageable);
+        List<Heart> hearts = heartRepository.findByMember(member);
+
+        if (hearts == null) hearts = new ArrayList<>();
+
+        List<Study> studies = hearts.stream().map(heart -> heart.getStudy())
+                .collect(Collectors.toList());
+        return studyRepositoryImpl.getMyStudyList(member, status, studies, pageable);
     }
 }
