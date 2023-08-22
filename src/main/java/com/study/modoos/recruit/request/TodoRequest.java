@@ -14,8 +14,6 @@ public class TodoRequest {
 
     String content;
 
-    String requestType;
-
     public Todo createTodo(Study study) {
         return Todo.builder()
                 .study(study)
