@@ -3,6 +3,8 @@ package com.study.modoos.recruit.service;
 import com.study.modoos.common.exception.ErrorCode;
 import com.study.modoos.common.exception.ModoosException;
 import com.study.modoos.common.service.EntityFinder;
+import com.study.modoos.heart.entity.Heart;
+import com.study.modoos.heart.repository.HeartRepository;
 import com.study.modoos.member.entity.Member;
 import com.study.modoos.participant.entity.Participant;
 import com.study.modoos.participant.repository.ParticipantRepository;
@@ -29,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +43,7 @@ public class RecruitService {
     private final EntityFinder entityFinder;
     private final TodoRepository todoRepository;
     private final ParticipantRepository participantRepostiory;
+    private final HeartRepository heartRepository;
 
     @Transactional
     public RecruitIdResponse postRecruit(Member currentMember, RecruitRequest request) {
@@ -86,10 +90,16 @@ public class RecruitService {
             participantResponseList.add(StudyParticipantResponse.of(participant, null));
         }
 
+        Optional<Heart> heart = heartRepository.findByMemberAndStudy(currentMember, study);
+        boolean isHeart = false;
+
+        if (heart.isPresent())
+            isHeart = true;
+
         if (currentMember != null && study.getLeader().getId().equals(currentMember.getId())) {
-            return RecruitInfoResponse.of(study, true, checkList, participantResponseList);
+            return RecruitInfoResponse.of(study, true, checkList, participantResponseList, isHeart);
         }
-        return RecruitInfoResponse.of(study, false, checkList, participantResponseList);
+        return RecruitInfoResponse.of(study, false, checkList, participantResponseList, isHeart);
     }
 
     public Slice<RecruitListInfoResponse> getRecruitList(Member member, String search, List<String> categoryList, Long lastId, String sortBy, Pageable pageable) {
@@ -108,7 +118,9 @@ public class RecruitService {
             lastStudy = studyRepository.findById(lastId)
                     .orElse(null);
         }
-        return studyRepositoryImpl.getSliceOfRecruit(member, search, categories, lastId, lastStudy, sortBy, pageable);
+
+        List<Heart> hearts = heartRepository.findByMember(member);
+        return studyRepositoryImpl.getSliceOfRecruit(member, search, categories, lastId, lastStudy, sortBy, hearts, pageable);
     }
 
     @Transactional
@@ -194,6 +206,12 @@ public class RecruitService {
 
     @Transactional
     public Slice<RecruitListInfoResponse> getMyStudyList(Member member, StudyStatus status, Pageable pageable) {
-        return studyRepositoryImpl.getMyStudyList(member, status, pageable);
+        List<Heart> hearts = heartRepository.findByMember(member);
+
+        if (hearts == null) hearts = new ArrayList<>();
+
+        List<Study> studies = hearts.stream().map(heart -> heart.getStudy())
+                .collect(Collectors.toList());
+        return studyRepositoryImpl.getMyStudyList(member, status, studies, pageable);
     }
 }
