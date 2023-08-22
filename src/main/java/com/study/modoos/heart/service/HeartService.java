@@ -17,10 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -44,11 +41,11 @@ public class HeartService {
                 .orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_FOUND));
         Study study = studyRepository.findById(recruitId)
                 .orElseThrow(() -> new ModoosException(ErrorCode.STUDY_NOT_FOUND));
-        Heart existingHeart = heartRepository.findByMemberAndStudy(currentUser, study);
+        Optional<Heart> existingHeart = heartRepository.findByMemberAndStudy(currentUser, study);
 
 
-        if (existingHeart != null) {
-            heartRepository.delete(existingHeart);
+        if (existingHeart.isPresent()) {
+            heartRepository.delete(existingHeart.get());
             study.deleteHeart();
         } else {
             Heart heart = new Heart(currentUser, study);

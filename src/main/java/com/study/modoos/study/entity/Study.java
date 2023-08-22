@@ -194,7 +194,7 @@ public class Study extends BaseTimeEntity {
         this.current_turn = current_turn;
     }
 
-    public void upadteIsEnd() {
+    public void updateIsEnd() {
         this.isEnd = true;
     }
 

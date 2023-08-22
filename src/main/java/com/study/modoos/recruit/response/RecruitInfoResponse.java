@@ -65,8 +65,11 @@ public class RecruitInfoResponse {
 
     private int out;
 
+    private boolean isHeart;
+
     public static RecruitInfoResponse of(Study study, boolean isWritten, List<TodoResponse> checkList,
-                                         List<StudyParticipantResponse> participantList) {
+                                         List<StudyParticipantResponse> participantList,
+                                         boolean isHeart) {
         return RecruitInfoResponse.builder()
                 .id(study.getId())
                 .leader_id(study.getLeader().getId())
@@ -91,6 +94,7 @@ public class RecruitInfoResponse {
                 .late(study.getLate())
                 .absent(study.getAbsent())
                 .out(study.getOut())
+                .isHeart(isHeart)
                 .build();
     }
 }

@@ -35,7 +35,9 @@ public class RecruitListInfoResponse {
 
     private LocalDate recruit_deadline;
 
-    public static RecruitListInfoResponse of(Study study) {
+    private boolean isHeart;
+
+    public static RecruitListInfoResponse of(Study study, boolean isHeart) {
         return RecruitListInfoResponse.builder()
                 .id(study.getId())
                 .leader_id(study.getLeader().getId())
@@ -47,6 +49,7 @@ public class RecruitListInfoResponse {
                 .recruits_count(study.getRecruits_count())
                 .participants_count(study.getParticipants_count())
                 .recruit_deadline(study.getRecruit_deadline())
+                .isHeart(isHeart)
                 .build();
     }
 }
