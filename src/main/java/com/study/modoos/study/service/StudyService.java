@@ -774,7 +774,7 @@ public class StudyService {
     public void checkStudyIsEnd(int idx, Study study) {
         if (idx == study.getTotal_turn()) { //마지막 주차이면 완주 반영했는지 확인
             if (!study.isEnd()) { //완주 반영 안 됐으면
-                study.upadteIsEnd();    //완주 반영
+                study.updateIsEnd();    //완주 반영
                 study.updateStatus(StudyStatus.STUDY_END);
 
                 List<Participant> participantList = participantRepository.findByStudy(study);
