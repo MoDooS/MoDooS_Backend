@@ -45,7 +45,7 @@ public class HeartService {
         Study study = studyRepository.findById(recruitId)
                 .orElseThrow(() -> new ModoosException(ErrorCode.STUDY_NOT_FOUND));
         Heart existingHeart = heartRepository.findByMemberAndStudy(currentUser, study);
-
+        boolean isHearted = false;
 
         if (existingHeart != null) {
             heartRepository.delete(existingHeart);
@@ -54,9 +54,10 @@ public class HeartService {
             Heart heart = new Heart(currentUser, study);
             heartRepository.save(heart);
             study.addHeart();
+            isHearted = true;
         }
         studyRepository.save(study);
-        return HeartClickResponse.of(member, study, existingHeart == null);
+        return HeartClickResponse.of(member, study, isHearted);
     }
 
     public List<Category> findMostCommonCategoryForMember(Member member) {
