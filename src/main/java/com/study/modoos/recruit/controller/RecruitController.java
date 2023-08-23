@@ -70,7 +70,7 @@ public class RecruitController {
 
     @GetMapping("/my-recruit")
     public ResponseEntity<Slice<RecruitListInfoResponse>> getMyRecruitList(@CurrentUser Member member,
-                                                                           @PageableDefault(sort = "createAt", direction = DESC) Pageable pageable){
+                                                                           @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable){
         return  ResponseEntity.ok(recruitService.getMyRecruit(member, pageable));
     }
 }
