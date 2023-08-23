@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -67,6 +68,8 @@ public class RecruitInfoResponse {
 
     private boolean isHeart;
 
+    private LocalDateTime createdAt;
+
     public static RecruitInfoResponse of(Study study, boolean isWritten, List<TodoResponse> checkList,
                                          List<StudyParticipantResponse> participantList,
                                          boolean isHeart) {
@@ -95,6 +98,7 @@ public class RecruitInfoResponse {
                 .absent(study.getAbsent())
                 .out(study.getOut())
                 .isHeart(isHeart)
+                .createdAt(study.getCreatedAt())
                 .build();
     }
 }
