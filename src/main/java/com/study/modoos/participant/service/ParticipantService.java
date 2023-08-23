@@ -95,6 +95,8 @@ public class ParticipantService {
 
         standbyRepository.delete(standby);
 
+        study.updateParticipantCount();
+
         Alarm alarm = new Alarm(currentUser, study, null, String.format("%s 스터디 신청이 수락되었습니다.",study.getTitle()), AlarmType.STUDY_ACCEPT);
         alarmRepository.save(alarm);
 

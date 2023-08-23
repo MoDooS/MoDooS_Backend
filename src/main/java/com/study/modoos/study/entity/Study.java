@@ -206,6 +206,7 @@ public class Study extends BaseTimeEntity {
         this.heart--;
     }
 
+    public void updateParticipantCount(){this.participants_count ++;}
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
