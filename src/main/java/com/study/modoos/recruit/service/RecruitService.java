@@ -216,6 +216,7 @@ public class RecruitService {
     }
 
     public Slice<RecruitListInfoResponse> getMyRecruit(Member member, Pageable pageable) {
-        return studyRepositoryImpl.getMyRecruitList(member, pageable);
+        List<Heart> hearts = heartRepository.findByMember(member);
+        return studyRepositoryImpl.getMyRecruitList(member, hearts, pageable);
     }
 }

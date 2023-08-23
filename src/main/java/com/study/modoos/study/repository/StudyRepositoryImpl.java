@@ -196,7 +196,7 @@ public class StudyRepositoryImpl {
         return new SliceImpl<>(contents, pageable, hasNext);
     }
 
-    public Slice<RecruitListInfoResponse> getMyRecruitList(Member member, Pageable pageable) {
+    public Slice<RecruitListInfoResponse> getMyRecruitList(Member member, List<Heart> hearts, Pageable pageable) {
         JPAQuery<Study> results = queryFactory.selectFrom(study)
                 .where(study.leader.eq(member))
                 .where(study.status.eq(StudyStatus.RECRUITING))
@@ -210,9 +210,16 @@ public class StudyRepositoryImpl {
         }
 
 
+        if (hearts == null) {
+            hearts = new ArrayList<>();
+        }
+
+        List<Study> studies = hearts.stream().map(heart -> heart.getStudy())
+                .collect(Collectors.toList());
+
         List<RecruitListInfoResponse> contents = results.fetch()
                 .stream()
-                .map(o -> RecruitListInfoResponse.of(o))
+                .map(o -> RecruitListInfoResponse.of(o, studies.contains(o)))
                 .collect(Collectors.toList());
 
 
