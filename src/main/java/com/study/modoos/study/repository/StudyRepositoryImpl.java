@@ -160,15 +160,14 @@ public class StudyRepositoryImpl {
                 .limit(pageable.getPageSize() + 1);
 
         if (status != null) {
-            if (status.equals(StudyStatus.RECRUITING) || status.equals(StudyStatus.RECRUIT_END)) {
-                results.where(
-                        study.status.eq(StudyStatus.RECRUITING).or(study.status.eq(StudyStatus.RECRUIT_END))
-                );
-                // 0: 모집중 상태
+            if (status.equals(StudyStatus.RECRUITING)) {  // 스터디 모집중
+                results.where(study.status.eq(StudyStatus.RECRUITING));
+            } else if (status.equals(StudyStatus.RECRUIT_END)){ // 스터디 모집 마감
+                results.where(study.status.eq(StudyStatus.STUDY_END));
             } else if (status.equals(StudyStatus.ONGOING)) {
                 results.where(study.status.eq(StudyStatus.ONGOING)); // 진행 중 상태
             } else if (status.equals(StudyStatus.STUDY_END)) {
-                results.where(study.status.eq(StudyStatus.STUDY_END)); // 2: 스터디 생성 완료 상태
+                results.where(study.status.eq(StudyStatus.STUDY_END)); // 스터디 종료
             } else {
                 throw new ModoosException(ErrorCode.STUDY_STATUS);
             }
