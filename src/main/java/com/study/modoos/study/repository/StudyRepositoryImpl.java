@@ -195,4 +195,34 @@ public class StudyRepositoryImpl {
 
         return new SliceImpl<>(contents, pageable, hasNext);
     }
+
+    public Slice<RecruitListInfoResponse> getMyRecruitList(Member member, Pageable pageable) {
+        JPAQuery<Study> results = queryFactory.selectFrom(study)
+                .where(study.leader.eq(member))
+                .where(study.status.eq(StudyStatus.RECRUITING))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1);
+
+        for (Sort.Order o : pageable.getSort()) {
+            PathBuilder pathBuilder = new PathBuilder(study.getType(), study.getMetadata());
+            results.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC :
+                    Order.DESC, pathBuilder.get(o.getProperty())));
+        }
+
+
+        List<RecruitListInfoResponse> contents = results.fetch()
+                .stream()
+                .map(o -> RecruitListInfoResponse.of(o))
+                .collect(Collectors.toList());
+
+
+        boolean hasNext = false;
+
+        if (contents.size() > pageable.getPageSize()) {
+            contents.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+
+        return new SliceImpl<>(contents, pageable, hasNext);
+    }
 }

@@ -214,4 +214,8 @@ public class RecruitService {
                 .collect(Collectors.toList());
         return studyRepositoryImpl.getMyStudyList(member, status, studies, pageable);
     }
+
+    public Slice<RecruitListInfoResponse> getMyRecruit(Member member, Pageable pageable) {
+        return studyRepositoryImpl.getMyRecruitList(member, pageable);
+    }
 }
