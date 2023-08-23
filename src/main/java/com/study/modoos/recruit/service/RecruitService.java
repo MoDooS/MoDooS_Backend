@@ -187,4 +187,8 @@ public class RecruitService {
     public Slice<RecruitListInfoResponse> getMyStudyList(Member member, StudyStatus status, Pageable pageable) {
         return studyRepositoryImpl.getMyStudyList(member, status, pageable);
     }
+
+    public Slice<RecruitListInfoResponse> getMyRecruit(Member member, Pageable pageable) {
+        return studyRepositoryImpl.getMyRecruitList(member, pageable);
+    }
 }
