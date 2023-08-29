@@ -37,7 +37,8 @@ public enum ErrorCode {
     INVALID_COOKIE_NAME(HttpStatus.NOT_FOUND, "JwtFilter > resolveToken 에서 쿠키 이름이 다릅니다", "cookie.getName()으로 쿠키 이름을 확인해주세요"),
     MISS_DEADLINE(HttpStatus.FORBIDDEN, "해당 스터디의 모집 마감일이 지났습니다.", "해당 스터디는 모집이 종료되었습니다." ),
     MEMBER_NOT_IN_ALARM(HttpStatus.NOT_FOUND, "해당 수신자에 대한 알림 데이터가 없습니다." , "알림이 생기면 확인해주세요"),
-    ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 알람을 찾을 수 없습니다.", "alarmId를 확인해주세요");
+    ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 알람을 찾을 수 없습니다.", "alarmId를 확인해주세요"),
+    MEMBER_HAS_NOT_ALARM(HttpStatus.NOT_FOUND, "해당 회원은 알림이 존재하지 않습니다.", "알림이 있는지 확인해주세요");
 
 
     private final HttpStatus httpStatus;

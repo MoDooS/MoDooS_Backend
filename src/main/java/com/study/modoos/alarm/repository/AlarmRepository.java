@@ -9,6 +9,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -16,4 +17,5 @@ import java.util.Optional;
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     Slice<Alarm> findByMemberOrderByCreatedAtDesc(Member member, Pageable sortedPageable);
     Optional<Alarm> findByStudyAndMemberAndAlarmType(Study study, Member member, AlarmType alarmType);
+    List<Alarm>findByMemberAndIsRead(Member member, boolean read);
 }
