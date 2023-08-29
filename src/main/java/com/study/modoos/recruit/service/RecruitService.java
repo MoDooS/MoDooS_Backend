@@ -132,7 +132,7 @@ public class RecruitService {
         }
 
         //스터디가 이미 생성된 모집공고면 삭제 불가능
-        if (study.getStatus() == StudyStatus.ONGOING) {
+        if (study.getStatus() == StudyStatus.ONGOING || study.getStatus() == StudyStatus.STUDY_END) {
             throw new ModoosException(ErrorCode.STUDY_NOT_EDIT);
         }
 

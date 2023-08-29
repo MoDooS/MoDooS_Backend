@@ -56,11 +56,6 @@ public class MemberService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_FOUND));
 
-        //기본정보와 랭킹, 점수
-        Long id = member.getId();
-        String nickname = member.getNickname();
-        String ranking = member.getRanking();
-        Long score = member.getScore();
 
         //관심있게 보는 스터디 태그
         List<Category> categoryList = heartService.findMostCommonCategoryForMember(member);

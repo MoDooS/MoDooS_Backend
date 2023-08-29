@@ -9,6 +9,7 @@ import com.study.modoos.member.entity.Member;
 import com.study.modoos.member.repository.MemberRepository;
 import com.study.modoos.participant.entity.Participant;
 import com.study.modoos.participant.repository.ParticipantRepository;
+import com.study.modoos.recruit.request.TodoRequest;
 import com.study.modoos.recruit.response.RecruitIdResponse;
 import com.study.modoos.recruit.response.TodoResponse;
 import com.study.modoos.study.entity.*;
@@ -82,6 +83,40 @@ public class StudyService {
                 request.getEndTime(), request.getPeriod(), request.getTotal_turn(),
                 request.getAbsent(), request.getLate(), request.getOut());
         study.updateStatus(StudyStatus.ONGOING);  //스터디 생성 완료 상태로 변경
+        //체크리스트 확인해서 update
+        List<TodoRequest> checkList = request.getCheckList();
+
+        List<Todo> todoList = todoRepository.findTodoByStudy(study);
+
+        //스터디에 연결된 todoList 확인
+        for (Todo todo : todoList) {
+            boolean flag = false;
+
+            for (TodoRequest todoRequest : checkList) {
+                if (todoRequest.getId() != null && todo.getId().equals(todoRequest.getId())) {
+                    todo.setContent(todoRequest.getContent());
+                    flag = true;
+                    todoRepository.save(todo);
+                    break;
+                }
+            }
+
+            //해당하는 값 없으면 삭제
+            if (!flag) {
+                todoRepository.delete(todo);
+            }
+        }
+
+        for (TodoRequest todoRequest : checkList) {
+            if (todoRequest.getId() == null) {
+                Todo todo = Todo.builder()
+                        .study(study)
+                        .content(todoRequest.getContent())
+                        .build();
+                todoRepository.save(todo);
+            }
+        }
+
         studyRepository.save(study);
         return RecruitIdResponse.of(study);
     }
