@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Function;
@@ -58,6 +59,7 @@ public class HeartService {
         return HeartClickResponse.of(member, study, isHearted);
     }
 
+    @Transactional
     public List<Category> findMostCommonCategoryForMember(Member member) {
         // 특정 멤버가 누른 Heart 엔티티들 조회
         List<Heart> hearts = heartRepository.findByMember(member);

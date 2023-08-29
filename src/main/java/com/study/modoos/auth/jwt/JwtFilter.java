@@ -27,7 +27,6 @@ public class JwtFilter extends OncePerRequestFilter {
         String accessToken = resolveToken(request);
 
         try { // 정상 토큰인지 검사
-            System.out.println("doFilterInternal validation test");
             if (accessToken != null && jwtProvider.validateAccessToken(accessToken)) {
                 Authentication authentication = jwtProvider.getAuthentication(accessToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
