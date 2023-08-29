@@ -11,7 +11,6 @@ import com.study.modoos.member.entity.Member;
 import com.study.modoos.member.repository.MemberRepository;
 import com.study.modoos.participant.repository.ParticipantRepository;
 import com.study.modoos.study.entity.Study;
-import com.study.modoos.study.repository.StudyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -129,5 +128,20 @@ public class AlarmService {
         requestAlarm.readAlarm(true);
         alarmRepository.save(requestAlarm);
         return ReadAlarmResponse.readAlarm(requestAlarm, true);
+    }
+
+    public void readAllAlarm(Member currentUser) {
+        Member member = memberRepository.findByEmail(currentUser.getEmail())
+                .orElseThrow(() -> new ModoosException(ErrorCode.MEMBER_NOT_FOUND));
+
+        List<Alarm> unreadAlarms = alarmRepository.findByMemberAndIsRead(member, false);
+        if (unreadAlarms.isEmpty()){
+            throw new ModoosException(ErrorCode.MEMBER_HAS_NOT_ALARM);
+        }else {
+            for (Alarm alarm : unreadAlarms) {
+                alarm.readAlarm(true);
+                alarmRepository.save(alarm);
+            }
+        }
     }
 }

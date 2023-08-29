@@ -4,6 +4,9 @@ import com.study.modoos.alarm.response.AlarmResponse;
 import com.study.modoos.alarm.response.ReadAlarmResponse;
 import com.study.modoos.alarm.service.AlarmService;
 import com.study.modoos.common.CurrentUser;
+import com.study.modoos.common.exception.ErrorCode;
+import com.study.modoos.common.exception.ModoosException;
+import com.study.modoos.common.response.NormalResponse;
 import com.study.modoos.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -34,4 +37,16 @@ public class AlarmController {
     public ResponseEntity<ReadAlarmResponse> readAlarm(@CurrentUser Member currentUser, @PathVariable Long alarmId) {
         return ResponseEntity.ok(alarmService.readAlarm(currentUser, alarmId));
     }
+
+    @GetMapping("/read/all")
+    public ResponseEntity<NormalResponse> readAllAlarm(@CurrentUser Member currentUser){
+        try {
+            alarmService.readAllAlarm(currentUser);
+            return ResponseEntity.ok(NormalResponse.success());
+        }
+        catch (ModoosException ex){
+            throw new ModoosException(ErrorCode.MEMBER_HAS_NOT_ALARM);
+        }
+    }
 }
+
